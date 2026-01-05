@@ -26,5 +26,5 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2024100700;       // The current module version (Date: YYYYMMDDXX).
 $plugin->requires  = 2024100100;    // Requires this Moodle version.
-$plugin->component = 'mod_survey';     // Full name of the plugin (used for diagnostics)
+$plugin->component = 'mod_coursesat';     // Full name of the plugin (used for diagnostics)
 $plugin->cron      = 0;

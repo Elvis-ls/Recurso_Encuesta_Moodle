@@ -281,3 +281,30 @@ $string['thanksforanswers'] = 'Thanks for answering this survey, {$a}';
 $string['time'] = 'Time';
 $string['notyetanswered'] = 'Not yet answered';
 $string['allquestionrequireanswer'] = 'All questions are required and must be answered.';
+
+// Nombre y descripción del template
+$string['satisfactionname'] = 'Encuesta de Satisfacción del Curso';
+$string['satisfactionintro'] = 'Por favor, ayúdanos a mejorar respondiendo esta breve encuesta sobre tu experiencia en el curso.';
+
+// PREGUNTA 1: Calificación general
+$string['satisfaction_q1'] = '¿Cómo calificarías el curso en general?';
+$string['satisfaction_q1_short'] = 'Calificación general';
+
+// PREGUNTA 2: Claridad
+$string['satisfaction_q2'] = '¿El contenido del curso fue claro y fácil de entender?';
+$string['satisfaction_q2_short'] = 'Claridad del contenido';
+
+// PREGUNTA 3: Utilidad
+$string['satisfaction_q3'] = '¿Qué tan útil fue este curso para alcanzar tus objetivos de aprendizaje?';
+$string['satisfaction_q3_short'] = 'Utilidad del curso';
+
+// PREGUNTA 4: Ritmo
+$string['satisfaction_q4'] = '¿El ritmo del curso fue apropiado?';
+$string['satisfaction_q4_short'] = 'Ritmo del curso';
+
+// PREGUNTA 5: Comentarios
+$string['satisfaction_q5'] = '¿Qué aspectos del curso crees que deberían mejorarse? (opcional)';
+$string['satisfaction_q5_short'] = 'Comentarios y sugerencias';
+
+// Escala de calificación 1-5
+$string['satisfaction_scale5'] = 'Muy malo,Malo,Regular,Bueno,Excelente';

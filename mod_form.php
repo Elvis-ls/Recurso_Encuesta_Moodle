@@ -1,6 +1,15 @@
 <?php
+/**
+ * ARCHIVO: mod_form.php
+ * 
+ * PROPÓSITO: Formulario de configuración que ve el profesor
+ * cuando crea/edita la actividad
+ * 
+ * MODIFICACIÓN: Simplificamos para usar solo la encuesta de satisfacción
+ */
+
 if (!defined('MOODLE_INTERNAL')) {
-    die('Direct access to this script is forbidden.');    ///  It must be included from a Moodle page
+    die('Direct access to this script is forbidden.');
 }
 
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
@@ -12,11 +21,13 @@ class mod_survey_mod_form extends moodleform_mod {
 
         $mform =& $this->_form;
 
-        $strrequired = get_string('required');
-
-//-------------------------------------------------------------------------------
+        // =============================================
+        // SECCIÓN 1: INFORMACIÓN BÁSICA
+        // =============================================
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
+        // Nombre de la actividad
+        // Esto es lo que verán los estudiantes en el curso
         $mform->addElement('text', 'name', get_string('name'), array('size'=>'64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
@@ -25,39 +36,58 @@ class mod_survey_mod_form extends moodleform_mod {
         }
         $mform->addRule('name', null, 'required', null, 'client');
 
-        if (!$options = $DB->get_records_menu("survey", array("template"=>0), "name", "id, name")) {
-            throw new \moodle_exception('cannotfindsurveytmpt', 'survey');
+        // =============================================
+        // TEMPLATE AUTOMÁTICO
+        // =============================================
+        // En lugar de dejar que el profesor elija, 
+        // automáticamente usamos la encuesta de satisfacción
+        
+        // Buscamos el template de satisfacción
+        $satisfactiontemplate = $DB->get_record('survey', 
+            array('name' => 'satisfactionname', 'template' => 0));
+        
+        if (!$satisfactiontemplate) {
+            throw new \moodle_exception('cannotfindsurveytmpt', 'survey', '', 
+                'No se encontró el template de satisfacción. ¿Ejecutaste la instalación?');
         }
 
-        foreach ($options as $id => $name) {
-            $options[$id] = get_string($name, "survey");
-        }
-        $options = array(''=>get_string('choose').'...') + $options;
-        $mform->addElement('select', 'template', get_string("surveytype", "survey"), $options);
-        $mform->addRule('template', $strrequired, 'required', null, 'client');
-        $mform->addHelpButton('template', 'surveytype', 'survey');
+        // Campo oculto con el template (el profesor no lo ve)
+        $mform->addElement('hidden', 'template', $satisfactiontemplate->id);
+        $mform->setType('template', PARAM_INT);
 
+        // Mensaje informativo para el profesor
+        $mform->addElement('static', 'templateinfo', 
+            get_string('surveytype', 'survey'),
+            '<strong>Encuesta de Satisfacción del Curso</strong><br>' .
+            'Esta encuesta contiene 5 preguntas diseñadas para medir la satisfacción de los estudiantes.');
+
+        // =============================================
+        // DESCRIPCIÓN (OPCIONAL)
+        // =============================================
+        // El profesor puede agregar instrucciones adicionales
         $this->standard_intro_elements(get_string('customintro', 'survey'));
 
+        // =============================================
+        // CONFIGURACIÓN ESTÁNDAR DE MOODLE
+        // =============================================
+        // Esto agrega automáticamente:
+        // - Configuración de finalización
+        // - Restricciones de acceso
+        // - Grupos
+        // - etc.
         $this->standard_coursemodule_elements();
 
-//-------------------------------------------------------------------------------
-        // buttons
+        // Botones de guardar/cancelar
         $this->add_action_buttons();
     }
 
     /**
-     * Allows module to modify the data returned by form get_data().
-     * This method is also called in the bulk activity completion form.
-     *
-     * Only available on moodleform_mod.
-     *
-     * @param stdClass $data the form data to be modified.
+     * Procesamiento de datos después de enviar el formulario
+     * Aquí manejamos la configuración de finalización
      */
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
         if (!empty($data->completionunlocked)) {
-            // Turn off completion settings if the checkboxes aren't ticked.
             $suffix = $this->get_suffix();
             $completion = $data->{'completion' . $suffix};
             $autocompletion = !empty($completion) && $completion == COMPLETION_TRACKING_AUTOMATIC;
@@ -68,26 +98,49 @@ class mod_survey_mod_form extends moodleform_mod {
     }
 
     /**
-     * Add completion rules to form.
-     * @return array
+     * Reglas de finalización
+     * Permitimos que el profesor configure que la actividad
+     * se marque como completa cuando el estudiante responda
      */
     public function add_completion_rules() {
         $mform =& $this->_form;
         $suffix = $this->get_suffix();
         $completionsubmitel = 'completionsubmit' . $suffix;
-        $mform->addElement('checkbox', $completionsubmitel, '', get_string('completionsubmit', 'survey'));
-        // Enable this completion rule by default.
+        
+        $mform->addElement('checkbox', $completionsubmitel, '', 
+            get_string('completionsubmit', 'survey'));
+        // Por defecto, marcamos la casilla
         $mform->setDefault($completionsubmitel, 1);
+        
         return [$completionsubmitel];
     }
 
     /**
-     * Enable completion rules
-     * @param array $data
-     * @return bool
+     * Verifica si las reglas de finalización están habilitadas
      */
     public function completion_rule_enabled($data) {
         $suffix = $this->get_suffix();
         return !empty($data['completionsubmit' . $suffix]);
     }
 }
+
+/**
+ * RESUMEN DE CAMBIOS EN ESTE ARCHIVO:
+ * 
+ * ANTES (versión original):
+ * - El profesor elegía entre ATTLS, COLLES, CIQ
+ * - Dropdown con múltiples opciones
+ * - Confuso para un uso simple
+ * 
+ * DESPUÉS (versión modificada):
+ * - Template automático de satisfacción
+ * - Campo oculto (el profesor no elige)
+ * - Mensaje informativo sobre qué preguntas contiene
+ * - Más simple y directo
+ * 
+ * VENTAJAS:
+ * 1. El profesor solo pone nombre y descripción
+ * 2. No hay confusión sobre qué tipo de encuesta usar
+ * 3. Siempre usa las mismas 5 preguntas de satisfacción
+ * 4. Más fácil de entender para profesores no técnicos
+ */
