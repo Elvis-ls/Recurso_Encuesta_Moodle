@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is responsible for producing the downloadable versions of a survey
+ * This file is responsible for producing the downloadable versions of a coursesat
  * module.
  *
  * @package   mod_coursesat
@@ -32,7 +32,7 @@ $id    = required_param('id', PARAM_INT);    // Course Module ID
 $type  = optional_param('type', 'xls', PARAM_ALPHA);
 $group = optional_param('group', 0, PARAM_INT);
 
-if (! $cm = get_coursemodule_from_id('survey', $id)) {
+if (! $cm = get_coursemodule_from_id('coursesat', $id)) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
@@ -42,17 +42,17 @@ if (! $course = $DB->get_record("course", array("id"=>$cm->course))) {
 
 $context = context_module::instance($cm->id);
 
-$PAGE->set_url('/mod/survey/download.php', array('id'=>$id, 'type'=>$type, 'group'=>$group));
+$PAGE->set_url('/mod/coursesat/download.php', array('id'=>$id, 'type'=>$type, 'group'=>$group));
 
 require_login($course, false, $cm);
-require_capability('mod/survey:download', $context) ;
+require_capability('mod/coursesat:download', $context) ;
 
-if (! $survey = $DB->get_record("survey", array("id"=>$cm->instance))) {
-    throw new \moodle_exception('invalidsurveyid', 'survey');
+if (! $coursesat = $DB->get_record("coursesat", array("id"=>$cm->instance))) {
+    throw new \moodle_exception('invalidcoursesatid', 'coursesat');
 }
 
 $params = array(
-    'objectid' => $survey->id,
+    'objectid' => $coursesat->id,
     'context' => $context,
     'courseid' => $course->id,
     'other' => array('type' => $type, 'groupid' => $group)
@@ -60,22 +60,22 @@ $params = array(
 $event = \mod_coursesat\event\report_downloaded::create($params);
 $event->trigger();
 
-/// Check to see if groups are being used in this survey
+/// Check to see if groups are being used in this coursesat
 
 $groupmode = groups_get_activity_groupmode($cm);   // Groups are being used
 
 if ($groupmode and $group) {
-    $users = get_users_by_capability($context, 'mod/survey:participate', '', '', '', '', $group, null, false);
+    $users = get_users_by_capability($context, 'mod/coursesat:participate', '', '', '', '', $group, null, false);
 } else {
-    $users = get_users_by_capability($context, 'mod/survey:participate', '', '', '', '', '', null, false);
+    $users = get_users_by_capability($context, 'mod/coursesat:participate', '', '', '', '', '', null, false);
     $group = false;
 }
 
 // The order of the questions
-$order = explode(",", $survey->questions);
+$order = explode(",", $coursesat->questions);
 
 // Get the actual questions from the database
-$questions = $DB->get_records_list("survey_questions", "id", $order);
+$questions = $DB->get_records_list("coursesat_questions", "id", $order);
 
 // Get an ordered array of questions
 $orderedquestions = array();
@@ -92,7 +92,7 @@ $nestedorder = array();//will contain the subquestions attached to the main ques
 $preparray = array();
 
 foreach ($orderedquestions as $qid=>$question) {
-    //$orderedquestions[$qid]->text = get_string($question->text, "survey");
+    //$orderedquestions[$qid]->text = get_string($question->text, "coursesat");
     if (!empty($question->multi)) {
         $actualqids = explode(",", $questions[$qid]->multi);
         foreach ($actualqids as $subqid) {
@@ -121,7 +121,7 @@ foreach ($nestedorder as $qid=>$subqidarray) {
 }
 
 //need to get info on the sub-questions from the db and merge the arrays of questions
-$allquestions = array_merge($questions, $DB->get_records_list("survey_questions", "id", array_keys($reversednestedorder)));
+$allquestions = array_merge($questions, $DB->get_records_list("coursesat_questions", "id", array_keys($reversednestedorder)));
 
 //array_merge() messes up the keys so reinstate them
 $questions = array();
@@ -129,26 +129,26 @@ foreach($allquestions as $question) {
     $questions[$question->id] = $question;
 
     //while were iterating over the questions get the question text
-    $questions[$question->id]->text = get_string($questions[$question->id]->text, "survey");
+    $questions[$question->id]->text = get_string($questions[$question->id]->text, "coursesat");
 }
 unset($allquestions);
 
 // Get and collate all the results in one big array
-if (! $surveyanswers = $DB->get_records("survey_answers", array("survey"=>$survey->id), "time ASC")) {
-    throw new \moodle_exception('cannotfindanswer', 'survey');
+if (! $coursesatanswers = $DB->get_records("coursesat_answers", array("coursesat"=>$coursesat->id), "time ASC")) {
+    throw new \moodle_exception('cannotfindanswer', 'coursesat');
 }
 
 $results = array();
 
-foreach ($surveyanswers as $surveyanswer) {
-    if (!$group || isset($users[$surveyanswer->userid])) {
-        //$questionid = $reversednestedorder[$surveyanswer->question];
-        $questionid = $surveyanswer->question;
-        if (!array_key_exists($surveyanswer->userid, $results)) {
-            $results[$surveyanswer->userid] = array('time'=>$surveyanswer->time);
+foreach ($coursesatanswers as $coursesatanswer) {
+    if (!$group || isset($users[$coursesatanswer->userid])) {
+        //$questionid = $reversednestedorder[$coursesatanswer->question];
+        $questionid = $coursesatanswer->question;
+        if (!array_key_exists($coursesatanswer->userid, $results)) {
+            $results[$coursesatanswer->userid] = array('time'=>$coursesatanswer->time);
         }
-        $results[$surveyanswer->userid][$questionid]['answer1'] = $surveyanswer->answer1;
-        $results[$surveyanswer->userid][$questionid]['answer2'] = $surveyanswer->answer2;
+        $results[$coursesatanswer->userid][$questionid]['answer1'] = $coursesatanswer->answer1;
+        $results[$coursesatanswer->userid][$questionid]['answer2'] = $coursesatanswer->answer2;
     }
 }
 
@@ -160,15 +160,15 @@ if ($type == "ods") {
     require_once("$CFG->libdir/odslib.class.php");
 
 /// Calculate file name
-    $downloadfilename = clean_filename(strip_tags($courseshortname.' '.format_string($survey->name, true))).'.ods';
+    $downloadfilename = clean_filename(strip_tags($courseshortname.' '.format_string($coursesat->name, true))).'.ods';
 /// Creating a workbook
     $workbook = new MoodleODSWorkbook("-");
 /// Sending HTTP headers
     $workbook->send($downloadfilename);
 /// Creating the first worksheet
-    $myxls = $workbook->add_worksheet(core_text::substr(strip_tags(format_string($survey->name,true)), 0, 31));
+    $myxls = $workbook->add_worksheet(core_text::substr(strip_tags(format_string($coursesat->name,true)), 0, 31));
 
-    $header = array("surveyid","surveyname","userid","firstname","lastname","email","idnumber","time", "notes");
+    $header = array("coursesatid","coursesatname","userid","firstname","lastname","email","idnumber","time", "notes");
     $col=0;
     foreach ($header as $item) {
         $myxls->write_string(0,$col++,$item);
@@ -196,13 +196,13 @@ if ($type == "ods") {
         if (! $u = $DB->get_record("user", array("id"=>$user))) {
             throw new \moodle_exception('invaliduserid');
         }
-        if ($n = $DB->get_record("survey_analysis", array("survey"=>$survey->id, "userid"=>$user))) {
+        if ($n = $DB->get_record("coursesat_analysis", array("coursesat"=>$coursesat->id, "userid"=>$user))) {
             $notes = $n->notes;
         } else {
             $notes = "No notes made";
         }
-        $myxls->write_string($row,$col++,$survey->id);
-        $myxls->write_string($row,$col++,strip_tags(format_text($survey->name,true)));
+        $myxls->write_string($row,$col++,$coursesat->id);
+        $myxls->write_string($row,$col++,strip_tags(format_text($coursesat->name,true)));
         $myxls->write_string($row,$col++,$user);
         $myxls->write_string($row,$col++,$u->firstname);
         $myxls->write_string($row,$col++,$u->lastname);
@@ -235,15 +235,15 @@ if ($type == "xls") {
     require_once("$CFG->libdir/excellib.class.php");
 
 /// Calculate file name
-    $downloadfilename = clean_filename(strip_tags($courseshortname.' '.format_string($survey->name,true))).'.xls';
+    $downloadfilename = clean_filename(strip_tags($courseshortname.' '.format_string($coursesat->name,true))).'.xls';
 /// Creating a workbook
     $workbook = new MoodleExcelWorkbook("-");
 /// Sending HTTP headers
     $workbook->send($downloadfilename);
 /// Creating the first worksheet
-    $myxls = $workbook->add_worksheet(core_text::substr(strip_tags(format_string($survey->name,true)), 0, 31));
+    $myxls = $workbook->add_worksheet(core_text::substr(strip_tags(format_string($coursesat->name,true)), 0, 31));
 
-    $header = array("surveyid","surveyname","userid","firstname","lastname","email","idnumber","time", "notes");
+    $header = array("coursesatid","coursesatname","userid","firstname","lastname","email","idnumber","time", "notes");
     $col=0;
     foreach ($header as $item) {
         $myxls->write_string(0,$col++,$item);
@@ -272,13 +272,13 @@ if ($type == "xls") {
         if (! $u = $DB->get_record("user", array("id"=>$user))) {
             throw new \moodle_exception('invaliduserid');
         }
-        if ($n = $DB->get_record("survey_analysis", array("survey"=>$survey->id, "userid"=>$user))) {
+        if ($n = $DB->get_record("coursesat_analysis", array("coursesat"=>$coursesat->id, "userid"=>$user))) {
             $notes = $n->notes;
         } else {
             $notes = "No notes made";
         }
-        $myxls->write_string($row,$col++,$survey->id);
-        $myxls->write_string($row,$col++,strip_tags(format_text($survey->name,true)));
+        $myxls->write_string($row,$col++,$coursesat->id);
+        $myxls->write_string($row,$col++,strip_tags(format_text($coursesat->name,true)));
         $myxls->write_string($row,$col++,$user);
         $myxls->write_string($row,$col++,$u->firstname);
         $myxls->write_string($row,$col++,$u->lastname);
@@ -313,12 +313,12 @@ if ($type == "xls") {
 
 header("Content-Type: application/download\n");
 
-$downloadfilename = clean_filename(strip_tags($courseshortname.' '.format_string($survey->name,true)));
+$downloadfilename = clean_filename(strip_tags($courseshortname.' '.format_string($coursesat->name,true)));
 header("Content-Disposition: attachment; filename=\"$downloadfilename.txt\"");
 
 // Print names of all the fields
 
-echo "surveyid    surveyname    userid    firstname    lastname    email    idnumber    time    ";
+echo "coursesatid    coursesatname    userid    firstname    lastname    email    idnumber    time    ";
 
 foreach ($nestedorder as $key => $nestedquestions) {
     foreach ($nestedquestions as $key2 => $qid) {
@@ -338,8 +338,8 @@ foreach ($results as $user => $rest) {
     if (! $u = $DB->get_record("user", array("id"=>$user))) {
         throw new \moodle_exception('invaliduserid');
     }
-    echo $survey->id."\t";
-    echo strip_tags(format_string($survey->name,true))."\t";
+    echo $coursesat->id."\t";
+    echo strip_tags(format_string($coursesat->name,true))."\t";
     echo $user."\t";
     echo $u->firstname."\t";
     echo $u->lastname."\t";

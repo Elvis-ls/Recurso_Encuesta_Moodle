@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Search area for mod_survey activities.
+ * Search area for mod_coursesat activities.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2015 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_survey\search;
+namespace mod_coursesat\search;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Search area for mod_survey activities.
+ * Search area for mod_coursesat activities.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2015 David Monllao {@link http://www.davidmonllao.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

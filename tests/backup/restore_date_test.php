@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_survey\backup;
+namespace mod_coursesat\backup;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -24,7 +24,7 @@ require_once($CFG->libdir . "/phpunit/classes/restore_date_testcase.php");
 /**
  * Restore date tests.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2017 onwards Ankit Agarwal <ankit.agrr@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,17 +33,17 @@ final class restore_date_test extends \restore_date_testcase {
     public function test_restore_dates(): void {
         global $DB;
 
-        list($course, $survey) = $this->create_course_and_module('survey');
-        $context = \context_module::instance($survey->cmid);
+        list($course, $coursesat) = $this->create_course_and_module('coursesat');
+        $context = \context_module::instance($coursesat->cmid);
 
         // Build our questions and responses array.
         $realquestions = array();
-        $questions = survey_get_questions($survey);
+        $questions = coursesat_get_questions($coursesat);
         $i = 5;
         foreach ($questions as $q) {
             if ($q->type > 0) {
                 if ($q->multi) {
-                    $subquestions = survey_get_subquestions($q);
+                    $subquestions = coursesat_get_subquestions($q);
                     foreach ($subquestions as $sq) {
                         $key = 'q' . $sq->id;
                         $realquestions[$key] = $i % 5 + 1;
@@ -56,16 +56,16 @@ final class restore_date_test extends \restore_date_testcase {
                 }
             }
         }
-        survey_save_answers($survey, $realquestions, $course, $context);
+        coursesat_save_answers($coursesat, $realquestions, $course, $context);
         // We do not want second differences to fail our test because of execution delays.
-        $DB->set_field('survey_answers', 'time', $this->startdate);
+        $DB->set_field('coursesat_answers', 'time', $this->startdate);
 
         // Do backup and restore.
         $newcourseid = $this->backup_and_restore($course);
-        $newsurvey = $DB->get_record('survey', ['course' => $newcourseid]);
-        $this->assertFieldsNotRolledForward($survey, $newsurvey, ['timecreated', 'timemodified']);
+        $newcoursesat = $DB->get_record('coursesat', ['course' => $newcourseid]);
+        $this->assertFieldsNotRolledForward($coursesat, $newcoursesat, ['timecreated', 'timemodified']);
 
-        $answers = $DB->get_records('survey_answers', ['survey' => $newsurvey->id]);
+        $answers = $DB->get_records('coursesat_answers', ['coursesat' => $newcoursesat->id]);
         foreach ($answers as $answer) {
             $this->assertEquals($this->startdate, $answer->time);
         }

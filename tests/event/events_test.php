@@ -17,17 +17,17 @@
 /**
  * Events tests.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_survey\event;
+namespace mod_coursesat\event;
 
 /**
  * Events tests class.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,9 +39,9 @@ final class events_test extends \advanced_testcase {
     public function setUp(): void {
         parent::setUp();
         $this->resetAfterTest();
-        // Survey module is disabled by default, enable it for testing.
+        // coursesat module is disabled by default, enable it for testing.
         $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
-        $manager::enable_plugin('survey', 1);
+        $manager::enable_plugin('coursesat', 1);
     }
 
     /**
@@ -52,15 +52,15 @@ final class events_test extends \advanced_testcase {
         // doing here is simply making sure that the events returns the right information.
 
         $course = $this->getDataGenerator()->create_course();
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id));
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id));
 
         $params = array(
-            'objectid' => $survey->id,
-            'context' => \context_module::instance($survey->cmid),
+            'objectid' => $coursesat->id,
+            'context' => \context_module::instance($coursesat->cmid),
             'courseid' => $course->id,
             'other' => array('type' => 'xls')
         );
-        $event = \mod_survey\event\report_downloaded::create($params);
+        $event = \mod_coursesat\event\report_downloaded::create($params);
 
         // Triggering and capturing the event.
         $sink = $this->redirectEvents();
@@ -70,9 +70,9 @@ final class events_test extends \advanced_testcase {
         $event = reset($events);
 
         // Checking that the event contains the expected values.
-        $this->assertInstanceOf('\mod_survey\event\report_downloaded', $event);
-        $this->assertEquals(\context_module::instance($survey->cmid), $event->get_context());
-        $this->assertEquals($survey->id, $event->objectid);
+        $this->assertInstanceOf('\mod_coursesat\event\report_downloaded', $event);
+        $this->assertEquals(\context_module::instance($coursesat->cmid), $event->get_context());
+        $this->assertEquals($coursesat->id, $event->objectid);
         $this->assertEventContextNotUsed($event);
     }
 
@@ -84,14 +84,14 @@ final class events_test extends \advanced_testcase {
         // doing here is simply making sure that the events returns the right information.
 
         $course = $this->getDataGenerator()->create_course();
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id));
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id));
 
         $params = array(
-            'objectid' => $survey->id,
-            'context' => \context_module::instance($survey->cmid),
+            'objectid' => $coursesat->id,
+            'context' => \context_module::instance($coursesat->cmid),
             'courseid' => $course->id
         );
-        $event = \mod_survey\event\report_viewed::create($params);
+        $event = \mod_coursesat\event\report_viewed::create($params);
 
         // Triggering and capturing the event.
         $sink = $this->redirectEvents();
@@ -101,9 +101,9 @@ final class events_test extends \advanced_testcase {
         $event = reset($events);
 
         // Checking that the event contains the expected values.
-        $this->assertInstanceOf('\mod_survey\event\report_viewed', $event);
-        $this->assertEquals(\context_module::instance($survey->cmid), $event->get_context());
-        $this->assertEquals($survey->id, $event->objectid);
+        $this->assertInstanceOf('\mod_coursesat\event\report_viewed', $event);
+        $this->assertEquals(\context_module::instance($coursesat->cmid), $event->get_context());
+        $this->assertEquals($coursesat->id, $event->objectid);
     }
 
     /**
@@ -114,14 +114,14 @@ final class events_test extends \advanced_testcase {
         // doing here is simply making sure that the events returns the right information.
 
         $course = $this->getDataGenerator()->create_course();
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id));
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id));
 
         $params = array(
-            'context' => \context_module::instance($survey->cmid),
+            'context' => \context_module::instance($coursesat->cmid),
             'courseid' => $course->id,
-            'other' => array('surveyid' => $survey->id)
+            'other' => array('coursesatid' => $coursesat->id)
         );
-        $event = \mod_survey\event\response_submitted::create($params);
+        $event = \mod_coursesat\event\response_submitted::create($params);
 
         // Triggering and capturing the event.
         $sink = $this->redirectEvents();
@@ -131,9 +131,9 @@ final class events_test extends \advanced_testcase {
         $event = reset($events);
 
         // Checking that the event contains the expected values.
-        $this->assertInstanceOf('\mod_survey\event\response_submitted', $event);
-        $this->assertEquals(\context_module::instance($survey->cmid), $event->get_context());
-        $this->assertEquals($survey->id, $event->other['surveyid']);
+        $this->assertInstanceOf('\mod_coursesat\event\response_submitted', $event);
+        $this->assertEquals(\context_module::instance($coursesat->cmid), $event->get_context());
+        $this->assertEquals($coursesat->id, $event->other['coursesatid']);
         $this->assertEventContextNotUsed($event);
     }
 }

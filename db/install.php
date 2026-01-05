@@ -7,7 +7,7 @@
  * Aquí es donde crearemos las 5 preguntas de satisfacción
  */
 
-function xmldb_survey_install() {
+function xmldb_coursesat_install() {
     global $DB;
 
     // 1. CREAR EL TEMPLATE DE LA ENCUESTA
@@ -23,12 +23,12 @@ function xmldb_survey_install() {
     $template->intro = 'satisfactionintro'; // Introducción clave para traducir
     $template->questions = '1,2,3,4,5'; // IDs de las preguntas (las crearemos abajo)
     
-    $DB->insert_record('survey', $template);
+    $DB->insert_record('coursesat', $template);
 
     // 2. CREAR LAS PREGUNTAS
     // =======================
     // Cada pregunta tiene:
-    // - text: Texto completo de la pregunta (se traduce en lang/en/survey.php)
+    // - text: Texto completo de la pregunta (se traduce en lang/en/coursesat.php)
     // - shorttext: Versión corta (para reportes)
     // - type: Tipo de pregunta
     //   * 0 = texto libre (respuesta abierta)
@@ -43,7 +43,7 @@ function xmldb_survey_install() {
     $question1->intro = ''; // No necesita introducción especial
     $question1->type = 1; // Tipo 1 = selección única
     $question1->options = 'satisfaction_scale5'; // Escala 1-5
-    $DB->insert_record('survey_questions', $question1);
+    $DB->insert_record('coursesat_questions', $question1);
 
     // PREGUNTA 2: Claridad del contenido (1-5)
     $question2 = new stdClass();
@@ -53,7 +53,7 @@ function xmldb_survey_install() {
     $question2->intro = '';
     $question2->type = 1;
     $question2->options = 'satisfaction_scale5';
-    $DB->insert_record('survey_questions', $question2);
+    $DB->insert_record('coursesat_questions', $question2);
 
     // PREGUNTA 3: Utilidad del curso (1-5)
     $question3 = new stdClass();
@@ -63,7 +63,7 @@ function xmldb_survey_install() {
     $question3->intro = '';
     $question3->type = 1;
     $question3->options = 'satisfaction_scale5';
-    $DB->insert_record('survey_questions', $question3);
+    $DB->insert_record('coursesat_questions', $question3);
 
     // PREGUNTA 4: Ritmo del curso (1-5)
     $question4 = new stdClass();
@@ -73,7 +73,7 @@ function xmldb_survey_install() {
     $question4->intro = '';
     $question4->type = 1;
     $question4->options = 'satisfaction_scale5';
-    $DB->insert_record('survey_questions', $question4);
+    $DB->insert_record('coursesat_questions', $question4);
 
     // PREGUNTA 5: Comentarios abiertos (texto libre)
     $question5 = new stdClass();
@@ -83,7 +83,7 @@ function xmldb_survey_install() {
     $question5->intro = '';
     $question5->type = 0; // Tipo 0 = texto libre
     $question5->options = ''; // No tiene opciones (es texto abierto)
-    $DB->insert_record('survey_questions', $question5);
+    $DB->insert_record('coursesat_questions', $question5);
 }
 
 /**
@@ -91,12 +91,12 @@ function xmldb_survey_install() {
  * 
  * type = 0: Pregunta abierta (textarea)
  *   - El usuario escribe texto libre
- *   - Se guarda en survey_answers.answer1
+ *   - Se guarda en coursesat_answers.answer1
  * 
  * type = 1: Selección única (radio buttons)
  *   - El usuario elige una opción
  *   - Las opciones vienen de 'options' (ej: "1,2,3,4,5")
- *   - Se guarda el número elegido en survey_answers.answer1
+ *   - Se guarda el número elegido en coursesat_answers.answer1
  * 
  * type = 2: Preferido (usado en COLLES, no lo necesitamos)
  * type = 3: Actual y Preferido (usado en COLLES, no lo necesitamos)

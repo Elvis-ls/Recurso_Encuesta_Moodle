@@ -14,9 +14,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Javascript to handle survey validation.
+ * Javascript to handle coursesat validation.
  *
- * @module     mod_survey/validation
+ * @module     mod_coursesat/validation
  * @copyright  2017 Dan Poltawski <dan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      3.3
@@ -33,11 +33,11 @@ import Notification from 'core/notification';
 export const ensureRadiosChosen = (formid) => {
     const form = document.getElementById(formid);
     form.addEventListener('submit', (e) => {
-        const optionsToSet = form.querySelectorAll('input[type="radio"][data-survey-default="true"]:checked');
+        const optionsToSet = form.querySelectorAll('input[type="radio"][data-coursesat-default="true"]:checked');
         if (optionsToSet.length !== 0) {
             Notification.alert(
                 getString('error'),
-                getString('questionsnotanswered', 'survey'),
+                getString('questionsnotanswered', 'coursesat'),
                 getString('ok'),
             );
             e.preventDefault();

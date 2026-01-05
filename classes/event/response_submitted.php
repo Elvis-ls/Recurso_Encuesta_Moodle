@@ -15,27 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_survey response submitted event.
+ * The mod_coursesat response submitted event.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_survey\event;
+namespace mod_coursesat\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_survey response submitted event class.
+ * The mod_coursesat response submitted event class.
  *
  * @property-read array $other {
  *      Extra information about the event.
  *
- *      - int surveyid: ID of survey for which response was submitted.
+ *      - int coursesatid: ID of coursesat for which response was submitted.
  * }
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @since      Moodle 2.7
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -56,7 +56,7 @@ class response_submitted extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventresponsesubmitted', 'mod_survey');
+        return get_string('eventresponsesubmitted', 'mod_coursesat');
     }
 
     /**
@@ -65,7 +65,7 @@ class response_submitted extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' submitted a response for the survey with course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' submitted a response for the coursesat with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -74,7 +74,7 @@ class response_submitted extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url("/mod/survey/view.php", array('id' => $this->contextinstanceid));
+        return new \moodle_url("/mod/coursesat/view.php", array('id' => $this->contextinstanceid));
     }
 
     /**
@@ -85,14 +85,14 @@ class response_submitted extends \core\event\base {
      */
     protected function validate_data() {
         parent::validate_data();
-        if (empty($this->other['surveyid'])) {
-            throw new \coding_exception('The \'surveyid\' value must be set in other.');
+        if (empty($this->other['coursesatid'])) {
+            throw new \coding_exception('The \'coursesatid\' value must be set in other.');
         }
     }
 
     public static function get_other_mapping() {
         $othermapped = array();
-        $othermapped['surveyid'] = array('db' => 'survey', 'restore' => 'survey');
+        $othermapped['coursesatid'] = array('db' => 'coursesat', 'restore' => 'coursesat');
 
         return $othermapped;
     }

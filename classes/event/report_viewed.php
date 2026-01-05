@@ -15,19 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_survey report viewed event.
+ * The mod_coursesat report viewed event.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_survey\event;
+namespace mod_coursesat\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_survey report viewed event class.
+ * The mod_coursesat report viewed event class.
  *
  * @property-read array $other {
  *      Extra information about the event.
@@ -36,7 +36,7 @@ defined('MOODLE_INTERNAL') || die();
  *      - int groupid: (optional) report for groupid.
  * }
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @since      Moodle 2.7
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -47,7 +47,7 @@ class report_viewed extends \core\event\base {
      * Set basic properties for the event.
      */
     protected function init() {
-        $this->data['objecttable'] = 'survey';
+        $this->data['objecttable'] = 'coursesat';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_TEACHING;
     }
@@ -58,7 +58,7 @@ class report_viewed extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventreportviewed', 'mod_survey');
+        return get_string('eventreportviewed', 'mod_coursesat');
     }
 
     /**
@@ -67,7 +67,7 @@ class report_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed the report for the survey with course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' viewed the report for the coursesat with course module id '$this->contextinstanceid'.";
     }
 
     /**
@@ -81,11 +81,11 @@ class report_viewed extends \core\event\base {
         if (isset($this->other['action'])) {
             $params['action'] = $this->other['action'];
         }
-        return new \moodle_url("/mod/survey/report.php", $params);
+        return new \moodle_url("/mod/coursesat/report.php", $params);
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'survey', 'restore' => 'survey');
+        return array('db' => 'coursesat', 'restore' => 'coursesat');
     }
 
     public static function get_other_mapping() {

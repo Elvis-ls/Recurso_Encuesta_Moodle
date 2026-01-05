@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Survey external functions and service definitions.
+ * coursesat external functions and service definitions.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @category   external
  * @copyright  2015 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -28,40 +28,40 @@ defined('MOODLE_INTERNAL') || die;
 
 $functions = array(
 
-    'mod_survey_get_surveys_by_courses' => array(
-        'classname'     => 'mod_survey_external',
-        'methodname'    => 'get_surveys_by_courses',
-        'description'   => 'Returns a list of survey instances in a provided set of courses,
-                            if no courses are provided then all the survey instances the user has access to will be returned.',
+    'mod_coursesat_get_coursesats_by_courses' => array(
+        'classname'     => 'mod_coursesat_external',
+        'methodname'    => 'get_coursesats_by_courses',
+        'description'   => 'Returns a list of coursesat instances in a provided set of courses,
+                            if no courses are provided then all the coursesat instances the user has access to will be returned.',
         'type'          => 'read',
         'capabilities'  => '',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     ),
 
-    'mod_survey_view_survey' => array(
-        'classname'     => 'mod_survey_external',
-        'methodname'    => 'view_survey',
+    'mod_coursesat_view_coursesat' => array(
+        'classname'     => 'mod_coursesat_external',
+        'methodname'    => 'view_coursesat',
         'description'   => 'Trigger the course module viewed event and update the module completion status.',
         'type'          => 'write',
-        'capabilities'  => 'mod/survey:participate',
+        'capabilities'  => 'mod/coursesat:participate',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     ),
 
-    'mod_survey_get_questions' => array(
-        'classname'     => 'mod_survey_external',
+    'mod_coursesat_get_questions' => array(
+        'classname'     => 'mod_coursesat_external',
         'methodname'    => 'get_questions',
-        'description'   => 'Get the complete list of questions for the survey, including subquestions.',
+        'description'   => 'Get the complete list of questions for the coursesat, including subquestions.',
         'type'          => 'read',
-        'capabilities'  => 'mod/survey:participate',
+        'capabilities'  => 'mod/coursesat:participate',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     ),
 
-    'mod_survey_submit_answers' => array(
-        'classname'     => 'mod_survey_external',
+    'mod_coursesat_submit_answers' => array(
+        'classname'     => 'mod_coursesat_external',
         'methodname'    => 'submit_answers',
-        'description'   => 'Submit the answers for a given survey.',
+        'description'   => 'Submit the answers for a given coursesat.',
         'type'          => 'write',
-        'capabilities'  => 'mod/survey:participate',
+        'capabilities'  => 'mod/coursesat:participate',
         'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
     ),
 

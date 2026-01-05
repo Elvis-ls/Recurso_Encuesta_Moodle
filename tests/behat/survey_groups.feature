@@ -1,4 +1,4 @@
-@mod @mod_survey
+@mod @mod_coursesat
 Feature: Viewing response reports by group
   In order to view reponse reports on a large course
   As a teacher
@@ -38,31 +38,31 @@ Feature: Viewing response reports by group
       | user1      | G1    |
       | user2      | G2    |
       | user4      | G3    |
-    And I enable "survey" "mod" plugin
+    And I enable "coursesat" "mod" plugin
     And the following "activities" exist:
       | activity   | name            | intro                       | course | idnumber   | groupmode | template |
-      | survey     | Separate survey | survey with separate groups | C1     | survey1    | 1         | 5        |
-      | survey     | Visible survey  | survey with visible groups  | C1     | survey2    | 2         | 5        |
-    And I am on the "Separate survey" "survey activity" page logged in as user1
+      | coursesat     | Separate coursesat | coursesat with separate groups | C1     | coursesat1    | 1         | 5        |
+      | coursesat     | Visible coursesat  | coursesat with visible groups  | C1     | coursesat2    | 2         | 5        |
+    And I am on the "Separate coursesat" "coursesat activity" page logged in as user1
     And I press "Submit"
-    And I am on the "Separate survey" "survey activity" page logged in as user2
+    And I am on the "Separate coursesat" "coursesat activity" page logged in as user2
     And I press "Submit"
-    And I am on the "Separate survey" "survey activity" page logged in as user3
+    And I am on the "Separate coursesat" "coursesat activity" page logged in as user3
     And I press "Submit"
-    And I am on the "Separate survey" "survey activity" page logged in as user4
+    And I am on the "Separate coursesat" "coursesat activity" page logged in as user4
     And I press "Submit"
-    And I am on the "Visible survey" "survey activity" page logged in as user1
+    And I am on the "Visible coursesat" "coursesat activity" page logged in as user1
     And I press "Submit"
-    And I am on the "Visible survey" "survey activity" page logged in as user2
+    And I am on the "Visible coursesat" "coursesat activity" page logged in as user2
     And I press "Submit"
-    And I am on the "Visible survey" "survey activity" page logged in as user3
+    And I am on the "Visible coursesat" "coursesat activity" page logged in as user3
     And I press "Submit"
-    And I am on the "Visible survey" "survey activity" page logged in as user4
+    And I am on the "Visible coursesat" "coursesat activity" page logged in as user4
     And I press "Submit"
 
   Scenario Outline: Editing teachers should see all groups on the Results page. Non-editing teachers should see just their own
     groups in Separate groups mode, all groups in Visible groups mode.
-    Given I am on the "<survey>" "survey activity" page logged in as "<user>"
+    Given I am on the "<coursesat>" "coursesat activity" page logged in as "<user>"
     And I follow "Response reports"
     Then I <all> see "All participants"
     And I <G1> see "Group 1"
@@ -74,13 +74,13 @@ Feature: Viewing response reports by group
     And I <user4> see "User4NPgroup"
 
     Examples:
-      | survey  | user       | all        | G1         | G2         | user1  | user2      | user3      | user4      |
-      | survey1 | teacher1   | should     | should     | should     | should | should     | should     | should     |
-      | survey1 | noneditor1 | should not | should     | should not | should | should not | should not | should not |
-      | survey2 | teacher1   | should     | should     | should     | should | should     | should     | should     |
-      | survey2 | noneditor1 | should     | should     | should     | should | should not | should not | should not |
-      | survey2 | noneditor2 | should     | should     | should     | should | should not | should not | should not |
+      | coursesat  | user       | all        | G1         | G2         | user1  | user2      | user3      | user4      |
+      | coursesat1 | teacher1   | should     | should     | should     | should | should     | should     | should     |
+      | coursesat1 | noneditor1 | should not | should     | should not | should | should not | should not | should not |
+      | coursesat2 | teacher1   | should     | should     | should     | should | should     | should     | should     |
+      | coursesat2 | noneditor1 | should     | should     | should     | should | should not | should not | should not |
+      | coursesat2 | noneditor2 | should     | should     | should     | should | should not | should not | should not |
 
-  Scenario: Non-editing teacher without access to any groups should not see survey results in separate groups mode
-    Given I am on the "survey1" "survey activity" page logged in as "noneditor2"
+  Scenario: Non-editing teacher without access to any groups should not see coursesat results in separate groups mode
+    Given I am on the "coursesat1" "coursesat activity" page logged in as "noneditor2"
     Then I should not see "Response reports"

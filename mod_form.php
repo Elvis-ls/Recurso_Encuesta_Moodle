@@ -14,7 +14,7 @@ if (!defined('MOODLE_INTERNAL')) {
 
 require_once ($CFG->dirroot.'/course/moodleform_mod.php');
 
-class mod_survey_mod_form extends moodleform_mod {
+class mod_coursesat_mod_form extends moodleform_mod {
 
     function definition() {
         global $CFG, $DB;
@@ -43,11 +43,11 @@ class mod_survey_mod_form extends moodleform_mod {
         // automáticamente usamos la encuesta de satisfacción
         
         // Buscamos el template de satisfacción
-        $satisfactiontemplate = $DB->get_record('survey', 
+        $satisfactiontemplate = $DB->get_record('coursesat', 
             array('name' => 'satisfactionname', 'template' => 0));
         
         if (!$satisfactiontemplate) {
-            throw new \moodle_exception('cannotfindsurveytmpt', 'survey', '', 
+            throw new \moodle_exception('cannotfindcoursesattmpt', 'coursesat', '', 
                 'No se encontró el template de satisfacción. ¿Ejecutaste la instalación?');
         }
 
@@ -57,7 +57,7 @@ class mod_survey_mod_form extends moodleform_mod {
 
         // Mensaje informativo para el profesor
         $mform->addElement('static', 'templateinfo', 
-            get_string('surveytype', 'survey'),
+            get_string('coursesattype', 'coursesat'),
             '<strong>Encuesta de Satisfacción del Curso</strong><br>' .
             'Esta encuesta contiene 5 preguntas diseñadas para medir la satisfacción de los estudiantes.');
 
@@ -65,7 +65,7 @@ class mod_survey_mod_form extends moodleform_mod {
         // DESCRIPCIÓN (OPCIONAL)
         // =============================================
         // El profesor puede agregar instrucciones adicionales
-        $this->standard_intro_elements(get_string('customintro', 'survey'));
+        $this->standard_intro_elements(get_string('customintro', 'coursesat'));
 
         // =============================================
         // CONFIGURACIÓN ESTÁNDAR DE MOODLE
@@ -108,7 +108,7 @@ class mod_survey_mod_form extends moodleform_mod {
         $completionsubmitel = 'completionsubmit' . $suffix;
         
         $mform->addElement('checkbox', $completionsubmitel, '', 
-            get_string('completionsubmit', 'survey'));
+            get_string('completionsubmit', 'coursesat'));
         // Por defecto, marcamos la casilla
         $mform->setDefault($completionsubmitel, 1);
         

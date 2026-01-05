@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    mod_survey
+ * @package    mod_coursesat
  * @subpackage backup-moodle2
  * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,13 +24,13 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/survey/backup/moodle2/restore_survey_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/coursesat/backup/moodle2/restore_coursesat_stepslib.php'); // Because it exists (must)
 
 /**
- * survey restore task that provides all the settings and steps to perform one
+ * coursesat restore task that provides all the settings and steps to perform one
  * complete restore of the activity
  */
-class restore_survey_activity_task extends restore_activity_task {
+class restore_coursesat_activity_task extends restore_activity_task {
 
     /**
      * Define (add) particular settings this activity can have
@@ -43,8 +43,8 @@ class restore_survey_activity_task extends restore_activity_task {
      * Define (add) particular steps this activity can have
      */
     protected function define_my_steps() {
-        // survey only has one structure step
-        $this->add_step(new restore_survey_activity_structure_step('survey_structure', 'survey.xml'));
+        // coursesat only has one structure step
+        $this->add_step(new restore_coursesat_activity_structure_step('coursesat_structure', 'coursesat.xml'));
     }
 
     /**
@@ -54,7 +54,7 @@ class restore_survey_activity_task extends restore_activity_task {
     public static function define_decode_contents() {
         $contents = array();
 
-        $contents[] = new restore_decode_content('survey', array('intro'), 'survey');
+        $contents[] = new restore_decode_content('coursesat', array('intro'), 'coursesat');
 
         return $contents;
     }
@@ -66,8 +66,8 @@ class restore_survey_activity_task extends restore_activity_task {
     public static function define_decode_rules() {
         $rules = array();
 
-        $rules[] = new restore_decode_rule('SURVEYVIEWBYID', '/mod/survey/view.php?id=$1', 'course_module');
-        $rules[] = new restore_decode_rule('SURVEYINDEX', '/mod/survey/index.php?id=$1', 'course');
+        $rules[] = new restore_decode_rule('coursesatVIEWBYID', '/mod/coursesat/view.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('coursesatINDEX', '/mod/coursesat/index.php?id=$1', 'course');
 
         return $rules;
 
@@ -76,20 +76,20 @@ class restore_survey_activity_task extends restore_activity_task {
     /**
      * Define the restore log rules that will be applied
      * by the {@link restore_logs_processor} when restoring
-     * survey logs. It must return one array
+     * coursesat logs. It must return one array
      * of {@link restore_log_rule} objects
      */
     public static function define_restore_log_rules() {
         $rules = array();
 
-        $rules[] = new restore_log_rule('survey', 'add', 'view.php?id={course_module}', '{survey}');
-        $rules[] = new restore_log_rule('survey', 'update', 'view.php?id={course_module}', '{survey}');
-        $rules[] = new restore_log_rule('survey', 'view', 'view.php?id={course_module}', '{survey}');
-        $rules[] = new restore_log_rule('survey', 'download', 'download.php?id={course_module}&type=[type]&group=[group]', '{survey}');
-        $rules[] = new restore_log_rule('survey', 'view report', 'report.php?id={course_module}', '{survey}');
-        $rules[] = new restore_log_rule('survey', 'submit', 'view.php?id={course_module}', '{survey}');
-        $rules[] = new restore_log_rule('survey', 'view graph', 'view.php?id={course_module}', '{survey}');
-        $rules[] = new restore_log_rule('survey', 'view form', 'view.php?id={course_module}', '{survey}');
+        $rules[] = new restore_log_rule('coursesat', 'add', 'view.php?id={course_module}', '{coursesat}');
+        $rules[] = new restore_log_rule('coursesat', 'update', 'view.php?id={course_module}', '{coursesat}');
+        $rules[] = new restore_log_rule('coursesat', 'view', 'view.php?id={course_module}', '{coursesat}');
+        $rules[] = new restore_log_rule('coursesat', 'download', 'download.php?id={course_module}&type=[type]&group=[group]', '{coursesat}');
+        $rules[] = new restore_log_rule('coursesat', 'view report', 'report.php?id={course_module}', '{coursesat}');
+        $rules[] = new restore_log_rule('coursesat', 'submit', 'view.php?id={course_module}', '{coursesat}');
+        $rules[] = new restore_log_rule('coursesat', 'view graph', 'view.php?id={course_module}', '{coursesat}');
+        $rules[] = new restore_log_rule('coursesat', 'view form', 'view.php?id={course_module}', '{coursesat}');
 
         return $rules;
     }
@@ -107,7 +107,7 @@ class restore_survey_activity_task extends restore_activity_task {
     public static function define_restore_log_rules_for_course() {
         $rules = array();
 
-        $rules[] = new restore_log_rule('survey', 'view all', 'index.php?id={course}', null);
+        $rules[] = new restore_log_rule('coursesat', 'view all', 'index.php?id={course}', null);
 
         return $rules;
     }

@@ -16,29 +16,29 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
  * Graph size
- * @global int $SURVEY_GHEIGHT
+ * @global int $coursesat_GHEIGHT
  */
-global $SURVEY_GHEIGHT;
-$SURVEY_GHEIGHT = 500;
+global $coursesat_GHEIGHT;
+$coursesat_GHEIGHT = 500;
 /**
  * Graph size
- * @global int $SURVEY_GWIDTH
+ * @global int $coursesat_GWIDTH
  */
-global $SURVEY_GWIDTH;
-$SURVEY_GWIDTH  = 900;
+global $coursesat_GWIDTH;
+$coursesat_GWIDTH  = 900;
 /**
  * Question Type
- * @global array $SURVEY_QTYPE
+ * @global array $coursesat_QTYPE
  */
-global $SURVEY_QTYPE;
-$SURVEY_QTYPE = array (
+global $coursesat_QTYPE;
+$coursesat_QTYPE = array (
         "-3" => "Virtual Actual and Preferred",
         "-2" => "Virtual Preferred",
         "-1" => "Virtual Actual",
@@ -49,13 +49,13 @@ $SURVEY_QTYPE = array (
         );
 
 
-define("SURVEY_COLLES_ACTUAL",           "1");
-define("SURVEY_COLLES_PREFERRED",        "2");
-define("SURVEY_COLLES_PREFERRED_ACTUAL", "3");
-define("SURVEY_ATTLS",                   "4");
-define("SURVEY_CIQ",                     "5");
+define("coursesat_COLLES_ACTUAL",           "1");
+define("coursesat_COLLES_PREFERRED",        "2");
+define("coursesat_COLLES_PREFERRED_ACTUAL", "3");
+define("coursesat_ATTLS",                   "4");
+define("coursesat_CIQ",                     "5");
 // Question length to wrap.
-define("SURVEY_QLENGTH_WRAP",            "80");
+define("coursesat_QLENGTH_WRAP",            "80");
 
 require_once(__DIR__ . '/deprecatedlib.php');
 
@@ -67,24 +67,24 @@ require_once(__DIR__ . '/deprecatedlib.php');
  * of the new instance.
  *
  * @global object
- * @param object $survey
+ * @param object $coursesat
  * @return int|bool
  */
-function survey_add_instance($survey) {
+function coursesat_add_instance($coursesat) {
     global $DB;
 
-    if (!$template = $DB->get_record("survey", array("id"=>$survey->template))) {
+    if (!$template = $DB->get_record("coursesat", array("id"=>$coursesat->template))) {
         return 0;
     }
 
-    $survey->questions    = $template->questions;
-    $survey->timecreated  = time();
-    $survey->timemodified = $survey->timecreated;
+    $coursesat->questions    = $template->questions;
+    $coursesat->timecreated  = time();
+    $coursesat->timemodified = $coursesat->timecreated;
 
-    $id = $DB->insert_record("survey", $survey);
+    $id = $DB->insert_record("coursesat", $coursesat);
 
-    $completiontimeexpected = !empty($survey->completionexpected) ? $survey->completionexpected : null;
-    \core_completion\api::update_completion_date_event($survey->coursemodule, 'survey', $id, $completiontimeexpected);
+    $completiontimeexpected = !empty($coursesat->completionexpected) ? $coursesat->completionexpected : null;
+    \core_completion\api::update_completion_date_event($coursesat->coursemodule, 'coursesat', $id, $completiontimeexpected);
 
     return $id;
 
@@ -96,24 +96,24 @@ function survey_add_instance($survey) {
  * will update an existing instance with new data.
  *
  * @global object
- * @param object $survey
+ * @param object $coursesat
  * @return bool
  */
-function survey_update_instance($survey) {
+function coursesat_update_instance($coursesat) {
     global $DB;
 
-    if (!$template = $DB->get_record("survey", array("id"=>$survey->template))) {
+    if (!$template = $DB->get_record("coursesat", array("id"=>$coursesat->template))) {
         return 0;
     }
 
-    $survey->id           = $survey->instance;
-    $survey->questions    = $template->questions;
-    $survey->timemodified = time();
+    $coursesat->id           = $coursesat->instance;
+    $coursesat->questions    = $template->questions;
+    $coursesat->timemodified = time();
 
-    $completiontimeexpected = !empty($survey->completionexpected) ? $survey->completionexpected : null;
-    \core_completion\api::update_completion_date_event($survey->coursemodule, 'survey', $survey->id, $completiontimeexpected);
+    $completiontimeexpected = !empty($coursesat->completionexpected) ? $coursesat->completionexpected : null;
+    \core_completion\api::update_completion_date_event($coursesat->coursemodule, 'coursesat', $coursesat->id, $completiontimeexpected);
 
-    return $DB->update_record("survey", $survey);
+    return $DB->update_record("coursesat", $coursesat);
 }
 
 /**
@@ -125,27 +125,27 @@ function survey_update_instance($survey) {
  * @param int $id
  * @return bool
  */
-function survey_delete_instance($id) {
+function coursesat_delete_instance($id) {
     global $DB;
 
-    if (! $survey = $DB->get_record("survey", array("id"=>$id))) {
+    if (! $coursesat = $DB->get_record("coursesat", array("id"=>$id))) {
         return false;
     }
 
-    $cm = get_coursemodule_from_instance('survey', $id);
-    \core_completion\api::update_completion_date_event($cm->id, 'survey', $id, null);
+    $cm = get_coursemodule_from_instance('coursesat', $id);
+    \core_completion\api::update_completion_date_event($cm->id, 'coursesat', $id, null);
 
     $result = true;
 
-    if (! $DB->delete_records("survey_analysis", array("survey"=>$survey->id))) {
+    if (! $DB->delete_records("coursesat_analysis", array("coursesat"=>$coursesat->id))) {
         $result = false;
     }
 
-    if (! $DB->delete_records("survey_answers", array("survey"=>$survey->id))) {
+    if (! $DB->delete_records("coursesat_answers", array("coursesat"=>$coursesat->id))) {
         $result = false;
     }
 
-    if (! $DB->delete_records("survey", array("id"=>$survey->id))) {
+    if (! $DB->delete_records("coursesat", array("id"=>$coursesat->id))) {
         $result = false;
     }
 
@@ -157,17 +157,17 @@ function survey_delete_instance($id) {
  * @param object $course
  * @param object $user
  * @param object $mod
- * @param object $survey
+ * @param object $coursesat
  * @return $result
  */
-function survey_user_outline($course, $user, $mod, $survey) {
+function coursesat_user_outline($course, $user, $mod, $coursesat) {
     global $DB;
 
-    if ($answers = $DB->get_records("survey_answers", array('survey'=>$survey->id, 'userid'=>$user->id))) {
+    if ($answers = $DB->get_records("coursesat_answers", array('coursesat'=>$coursesat->id, 'userid'=>$user->id))) {
         $lastanswer = array_pop($answers);
 
         $result = new stdClass();
-        $result->info = get_string("done", "survey");
+        $result->info = get_string("done", "coursesat");
         $result->time = $lastanswer->time;
         return $result;
     }
@@ -177,28 +177,28 @@ function survey_user_outline($course, $user, $mod, $survey) {
 /**
  * @global stdObject
  * @global object
- * @uses SURVEY_CIQ
+ * @uses coursesat_CIQ
  * @param object $course
  * @param object $user
  * @param object $mod
- * @param object $survey
+ * @param object $coursesat
  */
-function survey_user_complete($course, $user, $mod, $survey) {
+function coursesat_user_complete($course, $user, $mod, $coursesat) {
     global $CFG, $DB, $OUTPUT;
 
-    if (survey_already_done($survey->id, $user->id)) {
-        if ($survey->template == SURVEY_CIQ) { // print out answers for critical incidents
+    if (coursesat_already_done($coursesat->id, $user->id)) {
+        if ($coursesat->template == coursesat_CIQ) { // print out answers for critical incidents
             $table = new html_table();
             $table->align = array("left", "left");
 
-            $questions = $DB->get_records_list("survey_questions", "id", explode(',', $survey->questions));
-            $questionorder = explode(",", $survey->questions);
+            $questions = $DB->get_records_list("coursesat_questions", "id", explode(',', $coursesat->questions));
+            $questionorder = explode(",", $coursesat->questions);
 
             foreach ($questionorder as $key=>$val) {
                 $question = $questions[$val];
-                $questiontext = get_string($question->shorttext, "survey");
+                $questiontext = get_string($question->shorttext, "coursesat");
 
-                if ($answer = survey_get_user_answer($survey->id, $question->id, $user->id)) {
+                if ($answer = coursesat_get_user_answer($coursesat->id, $question->id, $user->id)) {
                     $answertext = "$answer->answer1";
                 } else {
                     $answertext = "No answer";
@@ -209,11 +209,11 @@ function survey_user_complete($course, $user, $mod, $survey) {
 
         } else {
 
-            survey_print_graph("id=$mod->id&amp;sid=$user->id&amp;type=student.png");
+            coursesat_print_graph("id=$mod->id&amp;sid=$user->id&amp;type=student.png");
         }
 
     } else {
-        print_string("notdone", "survey");
+        print_string("notdone", "coursesat");
     }
 }
 
@@ -225,13 +225,13 @@ function survey_user_complete($course, $user, $mod, $survey) {
  * @param int $timestamp
  * @return bool
  */
-function survey_print_recent_activity($course, $viewfullnames, $timestart) {
+function coursesat_print_recent_activity($course, $viewfullnames, $timestart) {
     global $CFG, $DB, $OUTPUT;
 
     $modinfo = get_fast_modinfo($course);
     $ids = array();
     foreach ($modinfo->cms as $cm) {
-        if ($cm->modname != 'survey') {
+        if ($cm->modname != 'coursesat') {
             continue;
         }
         if (!$cm->uservisible) {
@@ -248,36 +248,36 @@ function survey_print_recent_activity($course, $viewfullnames, $timestart) {
 
     $userfieldsapi = \core_user\fields::for_userpic();
     $allusernames = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
-    $rs = $DB->get_recordset_sql("SELECT sa.userid, sa.survey, MAX(sa.time) AS time,
+    $rs = $DB->get_recordset_sql("SELECT sa.userid, sa.coursesat, MAX(sa.time) AS time,
                                          $allusernames
-                                    FROM {survey_answers} sa
+                                    FROM {coursesat_answers} sa
                                     JOIN {user} u ON u.id = sa.userid
-                                   WHERE sa.survey IN ($slist) AND sa.time > ?
-                                GROUP BY sa.userid, sa.survey, $allusernames
+                                   WHERE sa.coursesat IN ($slist) AND sa.time > ?
+                                GROUP BY sa.userid, sa.coursesat, $allusernames
                                 ORDER BY time ASC", array($timestart));
     if (!$rs->valid()) {
         $rs->close(); // Not going to iterate (but exit), close rs
         return false;
     }
 
-    $surveys = array();
+    $coursesats = array();
 
-    foreach ($rs as $survey) {
-        $cm = $modinfo->instances['survey'][$survey->survey];
-        $survey->name = $cm->name;
-        $survey->cmid = $cm->id;
-        $surveys[] = $survey;
+    foreach ($rs as $coursesat) {
+        $cm = $modinfo->instances['coursesat'][$coursesat->coursesat];
+        $coursesat->name = $cm->name;
+        $coursesat->cmid = $cm->id;
+        $coursesats[] = $coursesat;
     }
     $rs->close();
 
-    if (!$surveys) {
+    if (!$coursesats) {
         return false;
     }
 
-    echo $OUTPUT->heading(get_string('newsurveyresponses', 'survey') . ':', 6);
-    foreach ($surveys as $survey) {
-        $url = $CFG->wwwroot.'/mod/survey/view.php?id='.$survey->cmid;
-        print_recent_activity_note($survey->time, $survey, $survey->name, $url, false, $viewfullnames);
+    echo $OUTPUT->heading(get_string('newcoursesatresponses', 'coursesat') . ':', 6);
+    foreach ($coursesats as $coursesat) {
+        $url = $CFG->wwwroot.'/mod/coursesat/view.php?id='.$coursesat->cmid;
+        print_recent_activity_note($coursesat->time, $coursesat, $coursesat->name, $url, false, $viewfullnames);
     }
 
     return true;
@@ -290,24 +290,24 @@ function survey_print_recent_activity($course, $viewfullnames, $timestart) {
  * @param sting $log
  * @return array
  */
-function survey_log_info($log) {
+function coursesat_log_info($log) {
     global $DB;
     return $DB->get_record_sql("SELECT s.name, u.firstname, u.lastname, u.picture
-                                  FROM {survey} s, {user} u
+                                  FROM {coursesat} s, {user} u
                                  WHERE s.id = ?  AND u.id = ?", array($log->info, $log->userid));
 }
 
 /**
  * @global object
- * @param int $surveyid
+ * @param int $coursesatid
  * @param int $groupid
  * @param int $groupingid
  * @return array
  */
-function survey_get_responses($surveyid, $groupid, $groupingid) {
+function coursesat_get_responses($coursesatid, $groupid, $groupingid) {
     global $DB;
 
-    $params = array('surveyid'=>$surveyid, 'groupid'=>$groupid, 'groupingid'=>$groupingid);
+    $params = array('coursesatid'=>$coursesatid, 'groupid'=>$groupid, 'groupingid'=>$groupingid);
 
     if ($groupid) {
         $groupsjoin = "JOIN {groups_members} gm ON u.id = gm.userid AND gm.groupid = :groupid ";
@@ -322,54 +322,54 @@ function survey_get_responses($surveyid, $groupid, $groupingid) {
     $userfieldsapi = \core_user\fields::for_userpic();
     $userfields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
     return $DB->get_records_sql("SELECT $userfields, MAX(a.time) as time
-                                   FROM {survey_answers} a
+                                   FROM {coursesat_answers} a
                                    JOIN {user} u ON a.userid = u.id
                             $groupsjoin
-                                  WHERE a.survey = :surveyid
+                                  WHERE a.coursesat = :coursesatid
                                GROUP BY $userfields
                                ORDER BY time ASC", $params);
 }
 
 /**
  * @global object
- * @param int $survey
+ * @param int $coursesat
  * @param int $user
  * @return array
  */
-function survey_get_analysis($survey, $user) {
+function coursesat_get_analysis($coursesat, $user) {
     global $DB;
 
     return $DB->get_record_sql("SELECT notes
-                                  FROM {survey_analysis}
-                                 WHERE survey=? AND userid=?", array($survey, $user));
+                                  FROM {coursesat_analysis}
+                                 WHERE coursesat=? AND userid=?", array($coursesat, $user));
 }
 
 /**
  * @global object
- * @param int $survey
+ * @param int $coursesat
  * @param int $user
  * @param string $notes
  */
-function survey_update_analysis($survey, $user, $notes) {
+function coursesat_update_analysis($coursesat, $user, $notes) {
     global $DB;
 
-    return $DB->execute("UPDATE {survey_analysis}
+    return $DB->execute("UPDATE {coursesat_analysis}
                             SET notes=?
-                          WHERE survey=?
-                            AND userid=?", array($notes, $survey, $user));
+                          WHERE coursesat=?
+                            AND userid=?", array($notes, $coursesat, $user));
 }
 
 /**
  * @global object
- * @param int $surveyid
+ * @param int $coursesatid
  * @param int $groupid
  * @param string $sort
  * @return array
  */
-function survey_get_user_answers($surveyid, $questionid, $groupid, $sort="sa.answer1,sa.answer2 ASC") {
+function coursesat_get_user_answers($coursesatid, $questionid, $groupid, $sort="sa.answer1,sa.answer2 ASC") {
     global $DB;
 
-    $params = array('surveyid'=>$surveyid, 'questionid'=>$questionid);
+    $params = array('coursesatid'=>$coursesatid, 'questionid'=>$questionid);
 
     if ($groupid) {
         $groupfrom = ', {groups_members} gm';
@@ -383,8 +383,8 @@ function survey_get_user_answers($surveyid, $questionid, $groupid, $sort="sa.ans
     $userfieldsapi = \core_user\fields::for_userpic();
     $userfields = $userfieldsapi->get_sql('u', false, '', '', false)->selects;
     return $DB->get_records_sql("SELECT sa.*, $userfields
-                                   FROM {survey_answers} sa,  {user} u $groupfrom
-                                  WHERE sa.survey = :surveyid
+                                   FROM {coursesat_answers} sa,  {user} u $groupfrom
+                                  WHERE sa.coursesat = :coursesatid
                                         AND sa.question = :questionid
                                         AND u.id = sa.userid $groupsql
                                ORDER BY $sort", $params);
@@ -392,58 +392,58 @@ function survey_get_user_answers($surveyid, $questionid, $groupid, $sort="sa.ans
 
 /**
  * @global object
- * @param int $surveyid
+ * @param int $coursesatid
  * @param int $questionid
  * @param int $userid
  * @return stdClass|false
  */
-function survey_get_user_answer($surveyid, $questionid, $userid) {
+function coursesat_get_user_answer($coursesatid, $questionid, $userid) {
     global $DB;
 
     return $DB->get_record_sql("SELECT sa.*
-                                  FROM {survey_answers} sa
-                                 WHERE sa.survey = ?
+                                  FROM {coursesat_answers} sa
+                                 WHERE sa.coursesat = ?
                                        AND sa.question = ?
-                                       AND sa.userid = ?", array($surveyid, $questionid, $userid));
+                                       AND sa.userid = ?", array($coursesatid, $questionid, $userid));
 }
 
 // MODULE FUNCTIONS ////////////////////////////////////////////////////////
 /**
  * @global object
- * @param int $survey
+ * @param int $coursesat
  * @param int $user
  * @param string $notes
  * @return bool|int
  */
-function survey_add_analysis($survey, $user, $notes) {
+function coursesat_add_analysis($coursesat, $user, $notes) {
     global $DB;
 
     $record = new stdClass();
-    $record->survey = $survey;
+    $record->coursesat = $coursesat;
     $record->userid = $user;
     $record->notes = $notes;
 
-    return $DB->insert_record("survey_analysis", $record, false);
+    return $DB->insert_record("coursesat_analysis", $record, false);
 }
 /**
  * @global object
- * @param int $survey
+ * @param int $coursesat
  * @param int $user
  * @return bool
  */
-function survey_already_done($survey, $user) {
+function coursesat_already_done($coursesat, $user) {
     global $DB;
 
-    return $DB->record_exists("survey_answers", array("survey"=>$survey, "userid"=>$user));
+    return $DB->record_exists("coursesat_answers", array("coursesat"=>$coursesat, "userid"=>$user));
 }
 /**
- * @param int $surveyid
+ * @param int $coursesatid
  * @param int $groupid
  * @param int $groupingid
  * @return int
  */
-function survey_count_responses($surveyid, $groupid, $groupingid) {
-    if ($responses = survey_get_responses($surveyid, $groupid, $groupingid)) {
+function coursesat_count_responses($coursesatid, $groupid, $groupingid) {
+    if ($responses = coursesat_get_responses($coursesatid, $groupid, $groupingid)) {
         return count($responses);
     } else {
         return 0;
@@ -455,7 +455,7 @@ function survey_count_responses($surveyid, $groupid, $groupingid) {
  * @param array $results
  * @param int $courseid
  */
-function survey_print_all_responses($cmid, $results, $courseid) {
+function coursesat_print_all_responses($cmid, $results, $courseid) {
     global $OUTPUT;
     $table = new html_table();
     $table->head  = array ("", get_string("name"),  get_string("time"));
@@ -476,11 +476,11 @@ function survey_print_all_responses($cmid, $results, $courseid) {
  * @param int $templateid
  * @return string
  */
-function survey_get_template_name($templateid) {
+function coursesat_get_template_name($templateid) {
     global $DB;
 
     if ($templateid) {
-        if ($ss = $DB->get_record("surveys", array("id"=>$templateid))) {
+        if ($ss = $DB->get_record("coursesats", array("id"=>$templateid))) {
             return $ss->name;
         }
     } else {
@@ -494,7 +494,7 @@ function survey_get_template_name($templateid) {
  * @param array $numwords
  * @return string
  */
-function survey_shorten_name ($name, $numwords) {
+function coursesat_shorten_name ($name, $numwords) {
     $words = explode(" ", $name);
     $output = '';
     for ($i=0; $i < $numwords; $i++) {
@@ -513,16 +513,16 @@ function survey_shorten_name ($name, $numwords) {
  * @global object This is defined twice?
  * @param object $question
  */
-function survey_print_multi($question) {
+function coursesat_print_multi($question) {
     global $USER, $DB, $qnum, $DB, $OUTPUT; //TODO: this is sloppy globals abuse
 
-    $stripreferthat = get_string("ipreferthat", "survey");
-    $strifoundthat = get_string("ifoundthat", "survey");
-    $strdefault    = get_string('notyetanswered', 'survey');
-    $strresponses  = get_string('responses', 'survey');
+    $stripreferthat = get_string("ipreferthat", "coursesat");
+    $strifoundthat = get_string("ifoundthat", "coursesat");
+    $strdefault    = get_string('notyetanswered', 'coursesat');
+    $strresponses  = get_string('responses', 'coursesat');
 
     echo $OUTPUT->heading($question->text, 3);
-    echo "\n<table width=\"90%\" cellpadding=\"4\" cellspacing=\"1\" border=\"0\" class=\"surveytable\">";
+    echo "\n<table width=\"90%\" cellpadding=\"4\" cellspacing=\"1\" border=\"0\" class=\"coursesattable\">";
 
     $options = explode( ",", $question->options);
     $numoptions = count($options);
@@ -545,7 +545,7 @@ function survey_print_multi($question) {
 
     echo "<colgroup colspan=\"7\"></colgroup>";
     echo "<tr class=\"smalltext\"><th scope=\"row\">$strresponses</th>";
-    echo "<th scope=\"col\" class=\"hresponse\">". get_string('notyetanswered', 'survey'). "</th>";
+    echo "<th scope=\"col\" class=\"hresponse\">". get_string('notyetanswered', 'coursesat'). "</th>";
     foreach ($options as $key => $val) {
         echo "<th scope=\"col\" class=\"hresponse\">$val</th>\n";
     }
@@ -553,17 +553,17 @@ function survey_print_multi($question) {
 
     echo "<tr><th scope=\"colgroup\" colspan=\"7\">$question->intro</th></tr>\n";
 
-    $subquestions = survey_get_subquestions($question);
+    $subquestions = coursesat_get_subquestions($question);
 
     foreach ($subquestions as $q) {
         $qnum++;
         if ($oneanswer) {
-            $rowclass = survey_question_rowclass($qnum);
+            $rowclass = coursesat_question_rowclass($qnum);
         } else {
-            $rowclass = survey_question_rowclass(round($qnum / 2));
+            $rowclass = coursesat_question_rowclass(round($qnum / 2));
         }
         if ($q->text) {
-            $q->text = get_string($q->text, "survey");
+            $q->text = get_string($q->text, "coursesat");
         }
 
         echo "<tr class=\"$rowclass rblock\">";
@@ -573,7 +573,7 @@ function survey_print_multi($question) {
             echo $q->text ."</th>\n";
 
             $default = get_accesshide($strdefault);
-            echo "<td class=\"whitecell\"><label for=\"q$P$q->id\"><input type=\"radio\" name=\"q$P$q->id\" id=\"q$P" . $q->id . "_D\" value=\"0\" checked=\"checked\" data-survey-default=\"true\" />$default</label></td>";
+            echo "<td class=\"whitecell\"><label for=\"q$P$q->id\"><input type=\"radio\" name=\"q$P$q->id\" id=\"q$P" . $q->id . "_D\" value=\"0\" checked=\"checked\" data-coursesat-default=\"true\" />$default</label></td>";
 
             for ($i=1;$i<=$numoptions;$i++) {
                 $hiddentext = get_accesshide($options[$i-1]);
@@ -588,7 +588,7 @@ function survey_print_multi($question) {
             echo "<span class=\"option\">$q->text</span></th>\n";
 
             $default = get_accesshide($strdefault);
-            echo '<td class="whitecell"><label for="qP'.$q->id.'"><input type="radio" name="qP'.$q->id.'" id="qP'.$q->id.'" value="0" checked="checked" data-survey-default="true" />'.$default.'</label></td>';
+            echo '<td class="whitecell"><label for="qP'.$q->id.'"><input type="radio" name="qP'.$q->id.'" id="qP'.$q->id.'" value="0" checked="checked" data-coursesat-default="true" />'.$default.'</label></td>';
 
 
             for ($i=1;$i<=$numoptions;$i++) {
@@ -605,7 +605,7 @@ function survey_print_multi($question) {
             echo "<span class=\"option\">$q->text</span></th>\n";
 
             $default = get_accesshide($strdefault);
-            echo '<td class="whitecell"><label for="q'. $q->id .'"><input type="radio" name="q'.$q->id. '" id="q'. $q->id .'" value="0" checked="checked" data-survey-default="true" />'.$default.'</label></td>';
+            echo '<td class="whitecell"><label for="q'. $q->id .'"><input type="radio" name="q'.$q->id. '" id="q'. $q->id .'" value="0" checked="checked" data-coursesat-default="true" />'.$default.'</label></td>';
 
             for ($i=1;$i<=$numoptions;$i++) {
                 $hiddentext = get_accesshide($options[$i-1]);
@@ -624,10 +624,10 @@ function survey_print_multi($question) {
  * @global int
  * @param object $question
  */
-function survey_print_single($question) {
+function coursesat_print_single($question) {
     global $DB, $qnum, $OUTPUT;
 
-    $rowclass = survey_question_rowclass(0);
+    $rowclass = coursesat_question_rowclass(0);
 
     $qnum++;
 
@@ -667,7 +667,7 @@ function survey_print_single($question) {
  * @param int $qnum
  * @return string
  */
-function survey_question_rowclass($qnum) {
+function coursesat_question_rowclass($qnum) {
 
     if ($qnum) {
         return $qnum % 2 ? 'r0' : 'r1';
@@ -682,11 +682,11 @@ function survey_question_rowclass($qnum) {
  * @global int
  * @param string $url
  */
-function survey_print_graph($url) {
-    global $CFG, $SURVEY_GHEIGHT, $SURVEY_GWIDTH;
+function coursesat_print_graph($url) {
+    global $CFG, $coursesat_GHEIGHT, $coursesat_GWIDTH;
 
-    echo "<img class='resultgraph' height=\"$SURVEY_GHEIGHT\" width=\"$SURVEY_GWIDTH\"".
-         " src=\"$CFG->wwwroot/mod/survey/graph.php?$url\" alt=\"".get_string("surveygraph", "survey")."\" />";
+    echo "<img class='resultgraph' height=\"$coursesat_GHEIGHT\" width=\"$coursesat_GWIDTH\"".
+         " src=\"$CFG->wwwroot/mod/coursesat/graph.php?$url\" alt=\"".get_string("coursesatgraph", "coursesat")."\" />";
 }
 
 /**
@@ -699,7 +699,7 @@ function survey_print_graph($url) {
  *
  * @return array
  */
-function survey_get_view_actions() {
+function coursesat_get_view_actions() {
     return array('download','view all','view form','view graph','view report');
 }
 
@@ -713,61 +713,61 @@ function survey_get_view_actions() {
  *
  * @return array
  */
-function survey_get_post_actions() {
+function coursesat_get_post_actions() {
     return array('submit');
 }
 
 
 /**
  * Implementation of the function for printing the form elements that control
- * whether the course reset functionality affects the survey.
+ * whether the course reset functionality affects the coursesat.
  *
  * @param MoodleQuickForm $mform form passed by reference
  */
-function survey_reset_course_form_definition(&$mform) {
-    $mform->addElement('header', 'surveyheader', get_string('modulenameplural', 'survey'));
-    $mform->addElement('static', 'surveydelete', get_string('delete'));
-    $mform->addElement('checkbox', 'reset_survey_answers', get_string('deleteallanswers', 'survey'));
-    $mform->addElement('checkbox', 'reset_survey_analysis', get_string('deleteanalysis', 'survey'));
-    $mform->hideIf('reset_survey_analysis', 'reset_survey_answers', 'checked');
+function coursesat_reset_course_form_definition(&$mform) {
+    $mform->addElement('header', 'coursesatheader', get_string('modulenameplural', 'coursesat'));
+    $mform->addElement('static', 'coursesatdelete', get_string('delete'));
+    $mform->addElement('checkbox', 'reset_coursesat_answers', get_string('deleteallanswers', 'coursesat'));
+    $mform->addElement('checkbox', 'reset_coursesat_analysis', get_string('deleteanalysis', 'coursesat'));
+    $mform->hideIf('reset_coursesat_analysis', 'reset_coursesat_answers', 'checked');
 }
 
 /**
  * Course reset form defaults.
  * @return array
  */
-function survey_reset_course_form_defaults($course) {
-    return array('reset_survey_answers'=>1, 'reset_survey_analysis'=>1);
+function coursesat_reset_course_form_defaults($course) {
+    return array('reset_coursesat_answers'=>1, 'reset_coursesat_analysis'=>1);
 }
 
 /**
  * Actual implementation of the reset course functionality, delete all the
- * survey responses for course $data->courseid.
+ * coursesat responses for course $data->courseid.
  *
  * @global object
  * @param $data the data submitted from the reset course.
  * @return array status array
  */
-function survey_reset_userdata($data) {
+function coursesat_reset_userdata($data) {
     global $DB;
 
-    $componentstr = get_string('modulenameplural', 'survey');
+    $componentstr = get_string('modulenameplural', 'coursesat');
     $status = array();
 
-    $surveyssql = "SELECT ch.id
-                     FROM {survey} ch
+    $coursesatssql = "SELECT ch.id
+                     FROM {coursesat} ch
                     WHERE ch.course=?";
     $params = array($data->courseid);
 
-    if (!empty($data->reset_survey_answers)) {
-        $DB->delete_records_select('survey_answers', "survey IN ($surveyssql)", $params);
-        $DB->delete_records_select('survey_analysis', "survey IN ($surveyssql)", $params);
-        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallanswers', 'survey'), 'error'=>false);
+    if (!empty($data->reset_coursesat_answers)) {
+        $DB->delete_records_select('coursesat_answers', "coursesat IN ($coursesatssql)", $params);
+        $DB->delete_records_select('coursesat_analysis', "coursesat IN ($coursesatssql)", $params);
+        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallanswers', 'coursesat'), 'error'=>false);
     }
 
-    if (!empty($data->reset_survey_analysis)) {
-        $DB->delete_records_select('survey_analysis', "survey IN ($surveyssql)", $params);
-        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallanswers', 'survey'), 'error'=>false);
+    if (!empty($data->reset_coursesat_analysis)) {
+        $DB->delete_records_select('coursesat_analysis', "coursesat IN ($coursesatssql)", $params);
+        $status[] = array('component'=>$componentstr, 'item'=>get_string('deleteallanswers', 'coursesat'), 'error'=>false);
     }
 
     // No date shifting.
@@ -787,7 +787,7 @@ function survey_reset_userdata($data) {
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed True if module supports feature, false if not, null if doesn't know or string for the module purpose.
  */
-function survey_supports($feature) {
+function coursesat_supports($feature) {
     switch($feature) {
         case FEATURE_GROUPS:                  return true;
         case FEATURE_GROUPINGS:               return true;
@@ -811,29 +811,29 @@ function survey_supports($feature) {
  * context when this is called
  *
  * @param settings_navigation $settings
- * @param navigation_node $surveynode
+ * @param navigation_node $coursesatnode
  */
-function survey_extend_settings_navigation(settings_navigation $settings, navigation_node $surveynode) {
+function coursesat_extend_settings_navigation(settings_navigation $settings, navigation_node $coursesatnode) {
     global $DB;
 
-    $cm = get_coursemodule_from_id('survey', $settings->get_page()->cm->id);
+    $cm = get_coursemodule_from_id('coursesat', $settings->get_page()->cm->id);
     $context = context_module::instance($cm->id);
 
-    // Check to see if groups are being used in this survey, confirm user can access.
+    // Check to see if groups are being used in this coursesat, confirm user can access.
     $groupmode = groups_get_activity_groupmode($cm);
     $currentgroup = groups_get_activity_group($cm, true);
 
-    if (has_capability('mod/survey:readresponses', $context) &&
+    if (has_capability('mod/coursesat:readresponses', $context) &&
             !($currentgroup === 0 && $groupmode == SEPARATEGROUPS && !has_capability('moodle/site:accessallgroups', $context))) {
 
-        $survey = $DB->get_record("survey", ["id" => $cm->instance]);
-        $url = new moodle_url('/mod/survey/report.php', ['id' => $cm->id]);
-        if ($survey && ($survey->template != SURVEY_CIQ)) {
+        $coursesat = $DB->get_record("coursesat", ["id" => $cm->instance]);
+        $url = new moodle_url('/mod/coursesat/report.php', ['id' => $cm->id]);
+        if ($coursesat && ($coursesat->template != coursesat_CIQ)) {
             $url->param('action', 'summary');
         } else {
             $url->param('action', 'questions');
         }
-        $surveynode->add(get_string("responsereports", "survey"), $url);
+        $coursesatnode->add(get_string("responsereports", "coursesat"), $url);
     }
 }
 
@@ -843,35 +843,35 @@ function survey_extend_settings_navigation(settings_navigation $settings, naviga
  * @param stdClass $parentcontext Block's parent context
  * @param stdClass $currentcontext Current context of block
  */
-function survey_page_type_list($pagetype, $parentcontext, $currentcontext) {
-    $module_pagetype = array('mod-survey-*'=>get_string('page-mod-survey-x', 'survey'));
+function coursesat_page_type_list($pagetype, $parentcontext, $currentcontext) {
+    $module_pagetype = array('mod-coursesat-*'=>get_string('page-mod-coursesat-x', 'coursesat'));
     return $module_pagetype;
 }
 
 /**
  * Mark the activity completed (if required) and trigger the course_module_viewed event.
  *
- * @param  stdClass $survey     survey object
+ * @param  stdClass $coursesat     coursesat object
  * @param  stdClass $course     course object
  * @param  stdClass $cm         course module object
  * @param  stdClass $context    context object
  * @param  string $viewed       which page viewed
  * @since Moodle 3.0
  */
-function survey_view($survey, $course, $cm, $context, $viewed) {
+function coursesat_view($coursesat, $course, $cm, $context, $viewed) {
 
     // Trigger course_module_viewed event.
     $params = array(
         'context' => $context,
-        'objectid' => $survey->id,
+        'objectid' => $coursesat->id,
         'courseid' => $course->id,
         'other' => array('viewed' => $viewed)
     );
 
-    $event = \mod_survey\event\course_module_viewed::create($params);
+    $event = \mod_coursesat\event\course_module_viewed::create($params);
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
-    $event->add_record_snapshot('survey', $survey);
+    $event->add_record_snapshot('coursesat', $coursesat);
     $event->trigger();
 
     // Completion.
@@ -887,7 +887,7 @@ function survey_view($survey, $course, $cm, $context, $viewed) {
  * @return array                list of questions ordered
  * @since Moodle 3.0
  */
-function survey_order_questions($questions, $questionorder) {
+function coursesat_order_questions($questions, $questionorder) {
 
     $finalquestions = array();
     foreach ($questionorder as $qid) {
@@ -903,43 +903,43 @@ function survey_order_questions($questions, $questionorder) {
  * @return stdClass question object with all the text fields translated
  * @since Moodle 3.0
  */
-function survey_translate_question($question) {
+function coursesat_translate_question($question) {
 
     if ($question->text) {
-        $question->text = get_string($question->text, "survey");
+        $question->text = get_string($question->text, "coursesat");
     }
 
     if ($question->shorttext) {
-        $question->shorttext = get_string($question->shorttext, "survey");
+        $question->shorttext = get_string($question->shorttext, "coursesat");
     }
 
     if ($question->intro) {
-        $question->intro = get_string($question->intro, "survey");
+        $question->intro = get_string($question->intro, "coursesat");
     }
 
     if ($question->options) {
-        $question->options = get_string($question->options, "survey");
+        $question->options = get_string($question->options, "coursesat");
     }
     return $question;
 }
 
 /**
- * Returns the questions for a survey (ordered).
+ * Returns the questions for a coursesat (ordered).
  *
- * @param  stdClass $survey survey object
+ * @param  stdClass $coursesat coursesat object
  * @return array list of questions ordered
  * @since Moodle 3.0
  * @throws  moodle_exception
  */
-function survey_get_questions($survey) {
+function coursesat_get_questions($coursesat) {
     global $DB;
 
-    $questionids = explode(',', $survey->questions);
-    if (! $questions = $DB->get_records_list("survey_questions", "id", $questionids)) {
-        throw new moodle_exception('cannotfindquestion', 'survey');
+    $questionids = explode(',', $coursesat->questions);
+    if (! $questions = $DB->get_records_list("coursesat_questions", "id", $questionids)) {
+        throw new moodle_exception('cannotfindquestion', 'coursesat');
     }
 
-    return survey_order_questions($questions, $questionids);
+    return coursesat_order_questions($questions, $questionids);
 }
 
 /**
@@ -949,25 +949,25 @@ function survey_get_questions($survey) {
  * @return array list of subquestions ordered
  * @since Moodle 3.0
  */
-function survey_get_subquestions($question) {
+function coursesat_get_subquestions($question) {
     global $DB;
 
     $questionids = explode(',', $question->multi);
-    $questions = $DB->get_records_list("survey_questions", "id", $questionids);
+    $questions = $DB->get_records_list("coursesat_questions", "id", $questionids);
 
-    return survey_order_questions($questions, $questionids);
+    return coursesat_order_questions($questions, $questionids);
 }
 
 /**
- * Save the answer for the given survey
+ * Save the answer for the given coursesat
  *
- * @param  stdClass $survey   a survey object
+ * @param  stdClass $coursesat   a coursesat object
  * @param  array $answersrawdata the answers to be saved
  * @param  stdClass $course   a course object (required for trigger the submitted event)
  * @param  stdClass $context  a context object (required for trigger the submitted event)
  * @since Moodle 3.0
  */
-function survey_save_answers($survey, $answersrawdata, $course, $context) {
+function coursesat_save_answers($coursesat, $answersrawdata, $course, $context) {
     global $DB, $USER;
 
     $answers = array();
@@ -996,7 +996,7 @@ function survey_save_answers($survey, $answersrawdata, $course, $context) {
             $newdata = new stdClass();
             $newdata->time = $timenow;
             $newdata->userid = $USER->id;
-            $newdata->survey = $survey->id;
+            $newdata->coursesat = $coursesat->id;
             $newdata->question = $key;
             if (!empty($val[0])) {
                 $newdata->answer1 = $val[0];
@@ -1014,22 +1014,22 @@ function survey_save_answers($survey, $answersrawdata, $course, $context) {
     }
 
     if (!empty($answerstoinsert)) {
-        $DB->insert_records("survey_answers", $answerstoinsert);
+        $DB->insert_records("coursesat_answers", $answerstoinsert);
     }
 
     // Update completion state.
-    $cm = get_coursemodule_from_instance('survey', $survey->id, $course->id);
+    $cm = get_coursemodule_from_instance('coursesat', $coursesat->id, $course->id);
     $completion = new completion_info($course);
-    if (isloggedin() && !isguestuser() && $completion->is_enabled($cm) && $survey->completionsubmit) {
+    if (isloggedin() && !isguestuser() && $completion->is_enabled($cm) && $coursesat->completionsubmit) {
         $completion->update_state($cm, COMPLETION_COMPLETE);
     }
 
     $params = array(
         'context' => $context,
         'courseid' => $course->id,
-        'other' => array('surveyid' => $survey->id)
+        'other' => array('coursesatid' => $coursesat->id)
     );
-    $event = \mod_survey\event\response_submitted::create($params);
+    $event = \mod_coursesat\event\response_submitted::create($params);
     $event->trigger();
 }
 
@@ -1042,27 +1042,27 @@ function survey_save_answers($survey, $answersrawdata, $course, $context) {
  * @return stdClass an object with the different type of areas indicating if they were updated or not
  * @since Moodle 3.2
  */
-function survey_check_updates_since(cm_info $cm, $from, $filter = array()) {
+function coursesat_check_updates_since(cm_info $cm, $from, $filter = array()) {
     global $DB, $USER;
 
     $updates = new stdClass();
-    if (!has_capability('mod/survey:participate', $cm->context)) {
+    if (!has_capability('mod/coursesat:participate', $cm->context)) {
         return $updates;
     }
     $updates = course_check_module_updates_since($cm, $from, array(), $filter);
 
     $updates->answers = (object) array('updated' => false);
-    $select = 'survey = ? AND userid = ? AND time > ?';
+    $select = 'coursesat = ? AND userid = ? AND time > ?';
     $params = array($cm->instance, $USER->id, $from);
-    $answers = $DB->get_records_select('survey_answers', $select, $params, '', 'id');
+    $answers = $DB->get_records_select('coursesat_answers', $select, $params, '', 'id');
     if (!empty($answers)) {
         $updates->answers->updated = true;
         $updates->answers->itemids = array_keys($answers);
     }
 
     // Now, teachers should see other students updates.
-    if (has_capability('mod/survey:readresponses', $cm->context)) {
-        $select = 'survey = ? AND time > ?';
+    if (has_capability('mod/coursesat:readresponses', $cm->context)) {
+        $select = 'coursesat = ? AND time > ?';
         $params = array($cm->instance, $from);
 
         if (groups_get_activity_groupmode($cm) == SEPARATEGROUPS) {
@@ -1076,7 +1076,7 @@ function survey_check_updates_since(cm_info $cm, $from, $filter = array()) {
         }
 
         $updates->useranswers = (object) array('updated' => false);
-        $answers = $DB->get_records_select('survey_answers', $select, $params, '', 'id');
+        $answers = $DB->get_records_select('coursesat_answers', $select, $params, '', 'id');
         if (!empty($answers)) {
             $updates->useranswers->updated = true;
             $updates->useranswers->itemids = array_keys($answers);
@@ -1096,7 +1096,7 @@ function survey_check_updates_since(cm_info $cm, $from, $filter = array()) {
  * @param int $userid User id to use for all capability checks, etc. Set to 0 for current user (default).
  * @return \core_calendar\local\event\entities\action_interface|null
  */
-function mod_survey_core_calendar_provide_event_action(calendar_event $event,
+function mod_coursesat_core_calendar_provide_event_action(calendar_event $event,
                                                       \core_calendar\action_factory $factory,
                                                       int $userid = 0) {
     global $USER;
@@ -1105,10 +1105,10 @@ function mod_survey_core_calendar_provide_event_action(calendar_event $event,
         $userid = $USER->id;
     }
 
-    $cm = get_fast_modinfo($event->courseid, $userid)->instances['survey'][$event->instance];
+    $cm = get_fast_modinfo($event->courseid, $userid)->instances['coursesat'][$event->instance];
     $context = context_module::instance($cm->id);
 
-    if (!has_capability('mod/survey:participate', $context, $userid)) {
+    if (!has_capability('mod/coursesat:participate', $context, $userid)) {
         return null;
     }
 
@@ -1122,14 +1122,14 @@ function mod_survey_core_calendar_provide_event_action(calendar_event $event,
 
     return $factory->create_instance(
         get_string('view'),
-        new \moodle_url('/mod/survey/view.php', ['id' => $cm->id]),
+        new \moodle_url('/mod/coursesat/view.php', ['id' => $cm->id]),
         1,
         true
     );
 }
 
 /**
- * Add a get_coursemodule_info function in case any survey type wants to add 'extra' information
+ * Add a get_coursemodule_info function in case any coursesat type wants to add 'extra' information
  * for the course (see resource).
  *
  * Given a course_module object, this function returns any "extra" information that may be needed
@@ -1139,26 +1139,26 @@ function mod_survey_core_calendar_provide_event_action(calendar_event $event,
  * @return cached_cm_info An object on information that the courses
  *                        will know about (most noticeably, an icon).
  */
-function survey_get_coursemodule_info($coursemodule) {
+function coursesat_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
     $fields = 'id, name, intro, introformat, completionsubmit';
-    if (!$survey = $DB->get_record('survey', $dbparams, $fields)) {
+    if (!$coursesat = $DB->get_record('coursesat', $dbparams, $fields)) {
         return false;
     }
 
     $result = new cached_cm_info();
-    $result->name = $survey->name;
+    $result->name = $coursesat->name;
 
     if ($coursemodule->showdescription) {
         // Convert intro to html. Do not filter cached version, filters run at display time.
-        $result->content = format_module_intro('survey', $survey, $coursemodule->id, false);
+        $result->content = format_module_intro('coursesat', $coursesat, $coursemodule->id, false);
     }
 
     // Populate the custom completion rules as key => value pairs, but only if the completion mode is 'automatic'.
     if ($coursemodule->completion == COMPLETION_TRACKING_AUTOMATIC) {
-        $result->customdata['customcompletionrules']['completionsubmit'] = $survey->completionsubmit;
+        $result->customdata['customcompletionrules']['completionsubmit'] = $coursesat->completionsubmit;
     }
 
     return $result;
@@ -1170,7 +1170,7 @@ function survey_get_coursemodule_info($coursemodule) {
  * @param cm_info|stdClass $cm object with fields ->completion and ->customdata['customcompletionrules']
  * @return array $descriptions the array of descriptions for the custom rules.
  */
-function mod_survey_get_completion_active_rule_descriptions($cm) {
+function mod_coursesat_get_completion_active_rule_descriptions($cm) {
     // Values will be present in cm_info, and we assume these are up to date.
     if (empty($cm->customdata['customcompletionrules'])
         || $cm->completion != COMPLETION_TRACKING_AUTOMATIC) {
@@ -1182,7 +1182,7 @@ function mod_survey_get_completion_active_rule_descriptions($cm) {
         switch ($key) {
             case 'completionsubmit':
                 if (!empty($val)) {
-                    $descriptions[] = get_string('completionsubmit', 'survey');
+                    $descriptions[] = get_string('completionsubmit', 'coursesat');
                 }
                 break;
             default:

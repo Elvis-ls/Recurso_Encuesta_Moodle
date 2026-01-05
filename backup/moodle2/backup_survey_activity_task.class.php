@@ -16,9 +16,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines backup_survey_activity_task class
+ * Defines backup_coursesat_activity_task class
  *
- * @package     mod_survey
+ * @package     mod_coursesat
  * @category    backup
  * @copyright   2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,12 +26,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/survey/backup/moodle2/backup_survey_stepslib.php');
+require_once($CFG->dirroot . '/mod/coursesat/backup/moodle2/backup_coursesat_stepslib.php');
 
 /**
  * Provides all the settings and steps to perform one complete backup of the activity
  */
-class backup_survey_activity_task extends backup_activity_task {
+class backup_coursesat_activity_task extends backup_activity_task {
 
     /**
      * No specific settings for this activity
@@ -40,10 +40,10 @@ class backup_survey_activity_task extends backup_activity_task {
     }
 
     /**
-     * Defines a backup step to store the instance data in the survey.xml file
+     * Defines a backup step to store the instance data in the coursesat.xml file
      */
     protected function define_my_steps() {
-        $this->add_step(new backup_survey_activity_structure_step('survey_structure', 'survey.xml'));
+        $this->add_step(new backup_coursesat_activity_structure_step('coursesat_structure', 'coursesat.xml'));
     }
 
     /**
@@ -57,13 +57,13 @@ class backup_survey_activity_task extends backup_activity_task {
 
         $base = preg_quote($CFG->wwwroot,"/");
 
-        // Link to the list of surveys
-        $search="/(".$base."\/mod\/survey\/index.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@SURVEYINDEX*$2@$', $content);
+        // Link to the list of coursesats
+        $search="/(".$base."\/mod\/coursesat\/index.php\?id\=)([0-9]+)/";
+        $content= preg_replace($search, '$@coursesatINDEX*$2@$', $content);
 
-        // Link to survey view by moduleid
-        $search="/(".$base."\/mod\/survey\/view.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@SURVEYVIEWBYID*$2@$', $content);
+        // Link to coursesat view by moduleid
+        $search="/(".$base."\/mod\/coursesat\/view.php\?id\=)([0-9]+)/";
+        $content= preg_replace($search, '$@coursesatVIEWBYID*$2@$', $content);
 
         return $content;
     }

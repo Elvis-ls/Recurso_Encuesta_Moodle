@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is responsible for producing the graph for survey reports
+ * This file is responsible for producing the graph for coursesat reports
  *
  * @package   mod_coursesat
  * @copyright 2021 Sujith Haridasan <sujith@moodle.com>
@@ -33,7 +33,7 @@ $group = optional_param('group', 0, PARAM_INT);  // Group ID.
 $sid = optional_param('sid', false, PARAM_INT);  // Student ID.
 $qid = optional_param('qid', 0, PARAM_INT);  // Group ID.
 
-$url = new moodle_url('/mod/survey/graph.php', array('id' => $id, 'type' => $type));
+$url = new moodle_url('/mod/coursesat/graph.php', array('id' => $id, 'type' => $type));
 if ($group !== 0) {
     $url->param('group', $group);
 }
@@ -45,7 +45,7 @@ if ($qid !== 0) {
 }
 $PAGE->set_url($url);
 
-if (!$cm = get_coursemodule_from_id('survey', $id)) {
+if (!$cm = get_coursemodule_from_id('coursesat', $id)) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
@@ -64,7 +64,7 @@ require_login($course, false, $cm);
 $groupmode = groups_get_activity_groupmode($cm);   // Groups are being used.
 $context = context_module::instance($cm->id);
 
-if (!has_capability('mod/survey:readresponses', $context)) {
+if (!has_capability('mod/coursesat:readresponses', $context)) {
     if ($type != "student.png" or $sid != $USER->id) {
         throw new \moodle_exception('nopermissiontoshow');
     } else if ($groupmode and !groups_is_member($group)) {
@@ -72,31 +72,31 @@ if (!has_capability('mod/survey:readresponses', $context)) {
     }
 }
 
-if (!$survey = $DB->get_record("survey", array("id" => $cm->instance))) {
-    throw new \moodle_exception('invalidsurveyid', 'survey');
+if (!$coursesat = $DB->get_record("coursesat", array("id" => $cm->instance))) {
+    throw new \moodle_exception('invalidcoursesatid', 'coursesat');
 }
 
-// Check to see if groups are being used in this survey.
+// Check to see if groups are being used in this coursesat.
 if ($group) {
-    $users = get_users_by_capability($context, 'mod/survey:participate', '', '', '', '', $group, null, false);
+    $users = get_users_by_capability($context, 'mod/coursesat:participate', '', '', '', '', $group, null, false);
 } else if (!empty($cm->groupingid)) {
     $groups = groups_get_all_groups($courseid, 0, $cm->groupingid);
     $groups = array_keys($groups);
-    $users = get_users_by_capability($context, 'mod/survey:participate', '', '', '', '', $groups, null, false);
+    $users = get_users_by_capability($context, 'mod/coursesat:participate', '', '', '', '', $groups, null, false);
 } else {
-    $users = get_users_by_capability($context, 'mod/survey:participate', '', '', '', '', '', null, false);
+    $users = get_users_by_capability($context, 'mod/coursesat:participate', '', '', '', '', '', null, false);
     $group = false;
 }
 
-$stractual = get_string("actual", "survey");
-$stractualclass = get_string("actualclass", "survey");
+$stractual = get_string("actual", "coursesat");
+$stractualclass = get_string("actualclass", "coursesat");
 
-$strpreferred = get_string("preferred", "survey");
-$strpreferredclass = get_string("preferredclass", "survey");
+$strpreferred = get_string("preferred", "coursesat");
+$strpreferredclass = get_string("preferredclass", "coursesat");
 
 if ($sid || isset($user)) {
-    $stractualstudent = get_string("actualstudent", "survey", fullname($user));
-    $strpreferredstudent = get_string("preferredstudent", "survey", fullname($user));
+    $stractualstudent = get_string("actualstudent", "coursesat", fullname($user));
+    $strpreferredstudent = get_string("preferredstudent", "coursesat", fullname($user));
 }
 
 $virtualscales = false; // Set default value for case clauses.
@@ -105,9 +105,9 @@ switch ($type) {
 
     case "question.png":
 
-        $question = $DB->get_record("survey_questions", array("id" => $qid));
-        $question->text = wordwrap(get_string($question->text, "survey"), SURVEY_QLENGTH_WRAP);
-        $question->options = get_string($question->options, "survey");
+        $question = $DB->get_record("coursesat_questions", array("id" => $qid));
+        $question->text = wordwrap(get_string($question->text, "coursesat"), coursesat_QLENGTH_WRAP);
+        $question->options = get_string($question->options, "coursesat");
 
         $options = explode(",", $question->options);
 
@@ -116,7 +116,7 @@ switch ($type) {
             $buckets2[$key] = 0;
         }
 
-        if ($aaa = $DB->get_records('survey_answers', array('survey' => $cm->instance, 'question' => $qid))) {
+        if ($aaa = $DB->get_records('coursesat_answers', array('coursesat' => $cm->instance, 'question' => $qid))) {
             foreach ($aaa as $aa) {
                 if (!$group or isset($users[$aa->userid])) {
                     if ($a1 = $aa->answer1) {
@@ -133,7 +133,7 @@ switch ($type) {
         $maxbuckets2 = max($buckets2);
         $maxbuckets = ($maxbuckets1 > $maxbuckets2) ? $maxbuckets1 : $maxbuckets2;
 
-        $graph = new graph($SURVEY_GWIDTH, $SURVEY_GHEIGHT);
+        $graph = new graph($coursesat_GWIDTH, $coursesat_GHEIGHT);
         $graph->parameter['title'] = "$question->text";
 
         $graph->x_data = $options;
@@ -170,17 +170,17 @@ switch ($type) {
 
     case "multiquestion.png":
 
-        $question = $DB->get_record("survey_questions", array("id" => $qid));
-        $question->text = get_string($question->text, "survey");
-        $question->options = get_string($question->options, "survey");
+        $question = $DB->get_record("coursesat_questions", array("id" => $qid));
+        $question->text = get_string($question->text, "coursesat");
+        $question->options = get_string($question->options, "coursesat");
 
         $options = explode(",", $question->options);
         $questionorder = explode(",", $question->multi);
 
-        $qqq = $DB->get_records_list("survey_questions", "id", explode(',', $question->multi));
+        $qqq = $DB->get_records_list("coursesat_questions", "id", explode(',', $question->multi));
 
         foreach ($questionorder as $i => $val) {
-            $names[$i] = get_string($qqq["$val"]->shorttext, "survey");
+            $names[$i] = get_string($qqq["$val"]->shorttext, "coursesat");
             $buckets1[$i] = 0;
             $buckets2[$i] = 0;
             $count1[$i] = 0;
@@ -190,7 +190,7 @@ switch ($type) {
             $stdev2[$i] = 0;
         }
 
-        $aaa = $DB->get_records_select("survey_answers", "((survey = ?) AND (question in ($question->multi)))",
+        $aaa = $DB->get_records_select("coursesat_answers", "((coursesat = ?) AND (question in ($question->multi)))",
                 array($cm->instance));
 
         if ($aaa) {
@@ -248,7 +248,7 @@ switch ($type) {
         $maxbuckets1 = max($buckets1);
         $maxbuckets2 = max($buckets2);
 
-        $graph = new graph($SURVEY_GWIDTH, $SURVEY_GHEIGHT);
+        $graph = new graph($coursesat_GWIDTH, $coursesat_GHEIGHT);
         $graph->parameter['title'] = "$question->text";
 
         $graph->x_data = $names;
@@ -295,12 +295,12 @@ switch ($type) {
 
     case "overall.png":
 
-        $qqq = $DB->get_records_list("survey_questions", "id", explode(',', $survey->questions));
+        $qqq = $DB->get_records_list("coursesat_questions", "id", explode(',', $coursesat->questions));
 
         foreach ($qqq as $key => $qq) {
             if ($qq->multi) {
-                $qqq[$key]->text = get_string($qq->text, "survey");
-                $qqq[$key]->options = get_string($qq->options, "survey");
+                $qqq[$key]->text = get_string($qq->text, "coursesat");
+                $qqq[$key]->options = get_string($qq->options, "coursesat");
                 if ($qq->type < 0) {
                     $virtualscales = true;
                 }
@@ -329,7 +329,7 @@ switch ($type) {
             $count1[$i] = 0;
             $count2[$i] = 0;
             $subquestions = $question[$i]->multi;   // Otherwise next line doesn't work.
-            $aaa = $DB->get_records_select("survey_answers", "((survey = ?) AND (question in ($subquestions)))",
+            $aaa = $DB->get_records_select("coursesat_answers", "((coursesat = ?) AND (question in ($subquestions)))",
                     array($cm->instance));
 
             if ($aaa) {
@@ -385,8 +385,8 @@ switch ($type) {
         $maxbuckets1 = max($buckets1);
         $maxbuckets2 = max($buckets2);
 
-        $graph = new graph($SURVEY_GWIDTH, $SURVEY_GHEIGHT);
-        $graph->parameter['title'] = strip_tags(format_string($survey->name, true));
+        $graph = new graph($coursesat_GWIDTH, $coursesat_GHEIGHT);
+        $graph->parameter['title'] = strip_tags(format_string($coursesat->name, true));
 
         $graph->x_data = $names;
 
@@ -433,12 +433,12 @@ switch ($type) {
 
     case "student.png":
 
-        $qqq = $DB->get_records_list("survey_questions", "id", explode(',', $survey->questions));
+        $qqq = $DB->get_records_list("coursesat_questions", "id", explode(',', $coursesat->questions));
 
         foreach ($qqq as $key => $qq) {
             if ($qq->multi) {
-                $qqq[$key]->text = get_string($qq->text, "survey");
-                $qqq[$key]->options = get_string($qq->options, "survey");
+                $qqq[$key]->text = get_string($qq->text, "coursesat");
+                $qqq[$key]->options = get_string($qq->options, "coursesat");
                 if ($qq->type < 0) {
                     $virtualscales = true;
                 }
@@ -472,7 +472,7 @@ switch ($type) {
             $stdev2[$i] = 0.0;
 
             $subquestions = $question[$i]->multi;   // Otherwise next line doesn't work.
-            $aaa = $DB->get_records_select("survey_answers", "((survey = ?) AND (question in ($subquestions)))",
+            $aaa = $DB->get_records_select("coursesat_answers", "((coursesat = ?) AND (question in ($subquestions)))",
                     array($cm->instance));
 
             if ($aaa) {
@@ -544,8 +544,8 @@ switch ($type) {
         $maxbuckets1 = max($buckets1);
         $maxbuckets2 = max($buckets2);
 
-        $graph = new graph($SURVEY_GWIDTH, $SURVEY_GHEIGHT);
-        $graph->parameter['title'] = strip_tags(format_string($survey->name, true));
+        $graph = new graph($coursesat_GWIDTH, $coursesat_GHEIGHT);
+        $graph->parameter['title'] = strip_tags(format_string($coursesat->name, true));
 
         $graph->x_data = $names;
 
@@ -597,17 +597,17 @@ switch ($type) {
 
     case "studentmultiquestion.png":
 
-        $question = $DB->get_record("survey_questions", array("id" => $qid));
-        $question->text = get_string($question->text, "survey");
-        $question->options = get_string($question->options, "survey");
+        $question = $DB->get_record("coursesat_questions", array("id" => $qid));
+        $question->text = get_string($question->text, "coursesat");
+        $question->options = get_string($question->options, "coursesat");
 
         $options = explode(",", $question->options);
         $questionorder = explode(",", $question->multi);
 
-        $qqq = $DB->get_records_list("survey_questions", "id", explode(',', $question->multi));
+        $qqq = $DB->get_records_list("coursesat_questions", "id", explode(',', $question->multi));
 
         foreach ($questionorder as $i => $val) {
-            $names[$i] = get_string($qqq[$val]->shorttext, "survey");
+            $names[$i] = get_string($qqq[$val]->shorttext, "coursesat");
             $buckets1[$i] = 0;
             $buckets2[$i] = 0;
             $count1[$i] = 0;
@@ -621,7 +621,7 @@ switch ($type) {
             $stdev2[$i] = 0.0;
         }
 
-        $aaa = $DB->get_records_select("survey_answers", "((survey = ?) AND (question in ($question->multi)))",
+        $aaa = $DB->get_records_select("coursesat_answers", "((coursesat = ?) AND (question in ($question->multi)))",
                 array($cm->instance));
 
         if ($aaa) {
@@ -695,7 +695,7 @@ switch ($type) {
         $maxbuckets1 = max($buckets1);
         $maxbuckets2 = max($buckets2);
 
-        $graph = new graph($SURVEY_GWIDTH, $SURVEY_GHEIGHT);
+        $graph = new graph($coursesat_GWIDTH, $coursesat_GHEIGHT);
         $graph->parameter['title'] = "$question->text";
 
         $graph->x_data = $names;

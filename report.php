@@ -16,9 +16,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is responsible for producing the survey reports
+ * This file is responsible for producing the coursesat reports
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -38,7 +38,7 @@ $qids = explode(',', $qid);
 $qids = clean_param_array($qids, PARAM_INT);
 $qid = implode(',', $qids);
 
-if (!$cm = get_coursemodule_from_id('survey', $id)) {
+if (!$cm = get_coursemodule_from_id('coursesat', $id)) {
     throw new moodle_exception('invalidcoursemodule');
 }
 
@@ -46,7 +46,7 @@ if (!$course = $DB->get_record("course", array("id" => $cm->course))) {
     throw new moodle_exception('coursemisconf');
 }
 
-$url = new moodle_url('/mod/survey/report.php', array('id' => $id));
+$url = new moodle_url('/mod/coursesat/report.php', array('id' => $id));
 if ($action !== '') {
     $url->param('action', $action);
 }
@@ -65,32 +65,32 @@ require_login($course, false, $cm);
 
 $context = context_module::instance($cm->id);
 
-require_capability('mod/survey:readresponses', $context);
+require_capability('mod/coursesat:readresponses', $context);
 
-if (!$survey = $DB->get_record("survey", array("id" => $cm->instance))) {
-    throw new moodle_exception('invalidsurveyid', 'survey');
+if (!$coursesat = $DB->get_record("coursesat", array("id" => $cm->instance))) {
+    throw new moodle_exception('invalidcoursesatid', 'coursesat');
 }
 
-if (!$template = $DB->get_record("survey", array("id" => $survey->template))) {
-    throw new moodle_exception('invalidtmptid', 'survey');
+if (!$template = $DB->get_record("coursesat", array("id" => $coursesat->template))) {
+    throw new moodle_exception('invalidtmptid', 'coursesat');
 }
 
 $showscales = ($template->name != 'ciqname');
 
-$strreport = get_string("report", "survey");
-$strsurvey = get_string("modulename", "survey");
-$strsurveys = get_string("modulenameplural", "survey");
-$strsummary = get_string("summary", "survey");
-$strscales = get_string("scales", "survey");
-$strquestion = get_string("question", "survey");
-$strquestions = get_string("questions", "survey");
-$strdownload = get_string("download", "survey");
-$strallscales = get_string("allscales", "survey");
-$strselectedquestions = get_string("selectedquestions", "survey");
-$strseemoredetail = get_string("seemoredetail", "survey");
-$strnotes = get_string("notes", "survey");
+$strreport = get_string("report", "coursesat");
+$strcoursesat = get_string("modulename", "coursesat");
+$strcoursesats = get_string("modulenameplural", "coursesat");
+$strsummary = get_string("summary", "coursesat");
+$strscales = get_string("scales", "coursesat");
+$strquestion = get_string("question", "coursesat");
+$strquestions = get_string("questions", "coursesat");
+$strdownload = get_string("download", "coursesat");
+$strallscales = get_string("allscales", "coursesat");
+$strselectedquestions = get_string("selectedquestions", "coursesat");
+$strseemoredetail = get_string("seemoredetail", "coursesat");
+$strnotes = get_string("notes", "coursesat");
 
-$PAGE->set_title("$course->shortname: " . format_string($survey->name));
+$PAGE->set_title("$course->shortname: " . format_string($coursesat->name));
 $PAGE->set_heading($course->fullname);
 $PAGE->activityheader->set_attrs([
         'hidecompletion' => true,
@@ -98,14 +98,14 @@ $PAGE->activityheader->set_attrs([
 ]);
 
 // Activate the secondary nav tab.
-navigation_node::override_active_url(new moodle_url('/mod/survey/report.php', ['id' => $id, 'action' => 'summary']));
+navigation_node::override_active_url(new moodle_url('/mod/coursesat/report.php', ['id' => $id, 'action' => 'summary']));
 
-$actionbar = new \mod_survey\output\actionbar($id, $action, $url);
+$actionbar = new \mod_coursesat\output\actionbar($id, $action, $url);
 echo $OUTPUT->header();
-$renderer = $PAGE->get_renderer('mod_survey');
+$renderer = $PAGE->get_renderer('mod_coursesat');
 echo $renderer->response_actionbar($actionbar);
 
-// Check to see if groups are being used in this survey.
+// Check to see if groups are being used in this coursesat.
 $groupmode = groups_get_activity_groupmode($cm);
 if ($groupmode != NOGROUPS) {
     $menuaction = $action == "student" ? "students" : $action;
@@ -116,7 +116,7 @@ if ($groupmode != NOGROUPS) {
         throw new moodle_exception('notingroup');
     }
 
-    $groupsactivitymenu = groups_print_activity_menu($cm, new moodle_url('/mod/survey/report.php',
+    $groupsactivitymenu = groups_print_activity_menu($cm, new moodle_url('/mod/coursesat/report.php',
             ['id' => $cm->id, 'action' => $menuaction, 'qid' => $qid]), true);
 } else {
     $currentgroup = 0;
@@ -124,23 +124,23 @@ if ($groupmode != NOGROUPS) {
 }
 
 $params = array(
-        'objectid' => $survey->id,
+        'objectid' => $coursesat->id,
         'context' => $context,
         'courseid' => $course->id,
         'relateduserid' => $student,
         'other' => array('action' => $action, 'groupid' => $currentgroup)
 );
-$event = \mod_survey\event\report_viewed::create($params);
+$event = \mod_coursesat\event\report_viewed::create($params);
 $event->trigger();
 
 if ($currentgroup) {
-    $users = get_users_by_capability($context, 'mod/survey:participate', '', '', '', '', $currentgroup, null, false);
+    $users = get_users_by_capability($context, 'mod/coursesat:participate', '', '', '', '', $currentgroup, null, false);
 } else if (!empty($cm->groupingid)) {
     $groups = groups_get_all_groups($courseid, 0, $cm->groupingid);
     $groups = array_keys($groups);
-    $users = get_users_by_capability($context, 'mod/survey:participate', '', '', '', '', $groups, null, false);
+    $users = get_users_by_capability($context, 'mod/coursesat:participate', '', '', '', '', $groups, null, false);
 } else {
-    $users = get_users_by_capability($context, 'mod/survey:participate', '', '', '', '', '', null, false);
+    $users = get_users_by_capability($context, 'mod/coursesat:participate', '', '', '', '', '', null, false);
     $group = false;
 }
 
@@ -153,8 +153,8 @@ $virtualscales = false;
 switch ($action) {
 
     case "summary":
-        // If survey type is Critical incidents then we don't show summary report.
-        if ($survey->template == SURVEY_CIQ) {
+        // If coursesat type is Critical incidents then we don't show summary report.
+        if ($coursesat->template == coursesat_CIQ) {
             throw new moodle_exception('cannotviewreport');
         }
         echo $OUTPUT->heading($strsummary, 3);
@@ -163,18 +163,18 @@ switch ($action) {
             echo html_writer::div($groupsactivitymenu, 'mb-2');
         }
 
-        if (survey_count_responses($survey->id, $currentgroup, $groupingid)) {
+        if (coursesat_count_responses($coursesat->id, $currentgroup, $groupingid)) {
             echo "<div class='reportsummary'><a href=\"report.php?action=scales&amp;id=$id\">";
-            survey_print_graph("id=$id&amp;group=$currentgroup&amp;type=overall.png");
+            coursesat_print_graph("id=$id&amp;group=$currentgroup&amp;type=overall.png");
             echo "</a></div>";
         } else {
-            echo $OUTPUT->notification(get_string("nobodyyet", "survey"), 'info', false);
+            echo $OUTPUT->notification(get_string("nobodyyet", "coursesat"), 'info', false);
         }
         break;
 
     case "scales":
-        // If survey type is Critical incidents then we don't show scales report.
-        if ($survey->template == SURVEY_CIQ) {
+        // If coursesat type is Critical incidents then we don't show scales report.
+        if ($coursesat->template == coursesat_CIQ) {
             throw new moodle_exception('cannotviewreport');
         }
         echo $OUTPUT->heading($strscales, 3);
@@ -183,13 +183,13 @@ switch ($action) {
             echo html_writer::div($groupsactivitymenu, 'mb-2');
         }
 
-        if (!$results = survey_get_responses($survey->id, $currentgroup, $groupingid)) {
-            echo $OUTPUT->notification(get_string("nobodyyet", "survey"), 'info', false);
+        if (!$results = coursesat_get_responses($coursesat->id, $currentgroup, $groupingid)) {
+            echo $OUTPUT->notification(get_string("nobodyyet", "coursesat"), 'info', false);
 
         } else {
 
-            $questions = $DB->get_records_list("survey_questions", "id", explode(',', $survey->questions));
-            $questionorder = explode(",", $survey->questions);
+            $questions = $DB->get_records_list("coursesat_questions", "id", explode(',', $coursesat->questions));
+            $questionorder = explode(",", $coursesat->questions);
 
             foreach ($questionorder as $key => $val) {
                 $question = $questions[$val];
@@ -206,7 +206,7 @@ switch ($action) {
                         continue;
                     }
                     echo "<p class=\"centerpara\"><a title=\"$strseemoredetail\" href=\"report.php?action=questions&amp;id=$id&amp;qid=$question->multi\">";
-                    survey_print_graph("id=$id&amp;qid=$question->id&amp;group=$currentgroup&amp;type=multiquestion.png");
+                    coursesat_print_graph("id=$id&amp;qid=$question->id&amp;group=$currentgroup&amp;type=multiquestion.png");
                     echo "</a></p><br />";
                 }
             }
@@ -217,10 +217,10 @@ switch ($action) {
     case "questions":
 
         if ($qid) {     // Just get one multi-question.
-            $questions = $DB->get_records_select("survey_questions", "id in ($qid)");
+            $questions = $DB->get_records_select("coursesat_questions", "id in ($qid)");
             $questionorder = explode(",", $qid);
 
-            if ($scale = $DB->get_records("survey_questions", array("multi" => $qid))) {
+            if ($scale = $DB->get_records("coursesat_questions", array("multi" => $qid))) {
                 $scale = array_pop($scale);
                 echo $OUTPUT->heading("$scale->text - $strselectedquestions", 3);
             } else {
@@ -228,8 +228,8 @@ switch ($action) {
             }
 
         } else {        // Get all top-level questions.
-            $questions = $DB->get_records_list("survey_questions", "id", explode(',', $survey->questions));
-            $questionorder = explode(",", $survey->questions);
+            $questions = $DB->get_records_list("coursesat_questions", "id", explode(',', $coursesat->questions));
+            $questionorder = explode(",", $coursesat->questions);
 
             echo $OUTPUT->heading($strquestions, 3);
         }
@@ -238,8 +238,8 @@ switch ($action) {
             echo html_writer::div($groupsactivitymenu, 'mb-2');
         }
 
-        if (!$results = survey_get_responses($survey->id, $currentgroup, $groupingid)) {
-            echo $OUTPUT->notification(get_string("nobodyyet", "survey"), 'info', false);
+        if (!$results = coursesat_get_responses($coursesat->id, $currentgroup, $groupingid)) {
+            echo $OUTPUT->notification(get_string("nobodyyet", "coursesat"), 'info', false);
 
         } else {
 
@@ -257,24 +257,24 @@ switch ($action) {
                 if ($question->type < 0) {  // We have some virtual scales.  DON'T show them.
                     continue;
                 }
-                $question->text = get_string($question->text, "survey");
+                $question->text = get_string($question->text, "coursesat");
 
                 if ($question->multi) {
                     echo $OUTPUT->heading($question->text . ':', 4);
 
-                    $subquestions = survey_get_subquestions($question);
+                    $subquestions = coursesat_get_subquestions($question);
                     foreach ($subquestions as $subquestion) {
                         if ($subquestion->type > 0) {
                             echo "<p class=\"centerpara\">";
                             echo "<a title=\"$strseemoredetail\" href=\"report.php?action=question&amp;id=$id&amp;qid=$subquestion->id\">";
-                            survey_print_graph("id=$id&amp;qid=$subquestion->id&amp;group=$currentgroup&amp;type=question.png");
+                            coursesat_print_graph("id=$id&amp;qid=$subquestion->id&amp;group=$currentgroup&amp;type=question.png");
                             echo "</a></p>";
                         }
                     }
                 } else if ($question->type > 0) {
                     echo "<p class=\"centerpara\">";
                     echo "<a title=\"$strseemoredetail\" href=\"report.php?action=question&amp;id=$id&amp;qid=$question->id\">";
-                    survey_print_graph("id=$id&amp;qid=$question->id&amp;group=$currentgroup&amp;type=question.png");
+                    coursesat_print_graph("id=$id&amp;qid=$question->id&amp;group=$currentgroup&amp;type=question.png");
                     echo "</a></p>";
 
                 } else {
@@ -284,7 +284,7 @@ switch ($action) {
 
                     $contents = '<table cellpadding="15" width="100%">';
 
-                    if ($aaa = survey_get_user_answers($survey->id, $question->id, $currentgroup, "sa.time ASC")) {
+                    if ($aaa = coursesat_get_user_answers($coursesat->id, $question->id, $currentgroup, "sa.time ASC")) {
                         foreach ($aaa as $a) {
                             $contents .= "<tr>";
                             $contents .= '<td class="fullnamecell">' . fullname($a) . '</td>';
@@ -306,12 +306,12 @@ switch ($action) {
         break;
 
     case "question":
-        if (!$question = $DB->get_record("survey_questions", array("id" => $qid))) {
-            throw new \moodle_exception('cannotfindquestion', 'survey');
+        if (!$question = $DB->get_record("coursesat_questions", array("id" => $qid))) {
+            throw new \moodle_exception('cannotfindquestion', 'coursesat');
         }
-        $question->text = get_string($question->text, "survey");
+        $question->text = get_string($question->text, "coursesat");
 
-        $answers = explode(",", get_string($question->options, "survey"));
+        $answers = explode(",", get_string($question->options, "coursesat"));
 
         echo $OUTPUT->heading("$strquestion: $question->text", 3);
 
@@ -319,10 +319,10 @@ switch ($action) {
             echo html_writer::div($groupsactivitymenu, 'mb-2');
         }
 
-        $strname = get_string("name", "survey");
-        $strtime = get_string("time", "survey");
-        $stractual = get_string("actual", "survey");
-        $strpreferred = get_string("preferred", "survey");
+        $strname = get_string("name", "coursesat");
+        $strtime = get_string("time", "coursesat");
+        $stractual = get_string("actual", "coursesat");
+        $strpreferred = get_string("preferred", "coursesat");
         $strdateformat = get_string("strftimedatetime");
 
         $table = new html_table();
@@ -330,7 +330,7 @@ switch ($action) {
         $table->align = array("left", "left", "left", "left", "right");
         $table->size = array(35, "", "", "", "");
 
-        if ($aaa = survey_get_user_answers($survey->id, $question->id, $currentgroup)) {
+        if ($aaa = coursesat_get_user_answers($coursesat->id, $question->id, $currentgroup)) {
             foreach ($aaa as $a) {
                 if ($a->answer1) {
                     $answer1 = "$a->answer1 - " . $answers[$a->answer1 - 1];
@@ -357,16 +357,16 @@ switch ($action) {
 
     case "students":
 
-        echo $OUTPUT->heading(get_string("analysisof", "survey", get_string('participants')), 3);
+        echo $OUTPUT->heading(get_string("analysisof", "coursesat", get_string('participants')), 3);
 
         if ($groupsactivitymenu) {
             echo html_writer::div($groupsactivitymenu, 'mb-2');
         }
 
-        if (!$results = survey_get_responses($survey->id, $currentgroup, $groupingid)) {
-            echo $OUTPUT->notification(get_string("nobodyyet", "survey"), 'info', false);
+        if (!$results = coursesat_get_responses($coursesat->id, $currentgroup, $groupingid)) {
+            echo $OUTPUT->notification(get_string("nobodyyet", "coursesat"), 'info', false);
         } else {
-            survey_print_all_responses($cm->id, $results, $course->id);
+            coursesat_print_all_responses($cm->id, $results, $course->id);
         }
 
         break;
@@ -377,24 +377,24 @@ switch ($action) {
             throw new moodle_exception('usernotavailable', 'error');
         }
 
-        echo $OUTPUT->heading(get_string("analysisof", "survey", fullname($user)), 3);
+        echo $OUTPUT->heading(get_string("analysisof", "coursesat", fullname($user)), 3);
 
         if ($groupsactivitymenu) {
             echo html_writer::div($groupsactivitymenu, 'mb-2');
         }
 
         if ($notes != '' and confirm_sesskey()) {
-            if (survey_get_analysis($survey->id, $user->id)) {
-                if (!survey_update_analysis($survey->id, $user->id, $notes)) {
-                    echo $OUTPUT->notification(get_string("errorunabletosavenotes", "survey"), "notifyproblem");
+            if (coursesat_get_analysis($coursesat->id, $user->id)) {
+                if (!coursesat_update_analysis($coursesat->id, $user->id, $notes)) {
+                    echo $OUTPUT->notification(get_string("errorunabletosavenotes", "coursesat"), "notifyproblem");
                 } else {
-                    echo $OUTPUT->notification(get_string("savednotes", "survey"), "notifysuccess");
+                    echo $OUTPUT->notification(get_string("savednotes", "coursesat"), "notifysuccess");
                 }
             } else {
-                if (!survey_add_analysis($survey->id, $user->id, $notes)) {
-                    echo $OUTPUT->notification(get_string("errorunabletosavenotes", "survey"), "notifyproblem");
+                if (!coursesat_add_analysis($coursesat->id, $user->id, $notes)) {
+                    echo $OUTPUT->notification(get_string("errorunabletosavenotes", "coursesat"), "notifyproblem");
                 } else {
-                    echo $OUTPUT->notification(get_string("savednotes", "survey"), "notifysuccess");
+                    echo $OUTPUT->notification(get_string("savednotes", "coursesat"), "notifysuccess");
                 }
             }
         }
@@ -403,13 +403,13 @@ switch ($action) {
         echo $OUTPUT->user_picture($user, array('courseid' => $course->id));
         echo "</p>";
 
-        $questions = $DB->get_records_list("survey_questions", "id", explode(',', $survey->questions));
-        $questionorder = explode(",", $survey->questions);
+        $questions = $DB->get_records_list("coursesat_questions", "id", explode(',', $coursesat->questions));
+        $questionorder = explode(",", $coursesat->questions);
 
         if ($showscales) {
             // Print overall summary.
             echo "<p class=\"centerpara\">";
-            survey_print_graph("id=$id&amp;sid=$student&amp;type=student.png");
+            coursesat_print_graph("id=$id&amp;sid=$student&amp;type=student.png");
             echo "</p>";
 
             // Print scales.
@@ -430,7 +430,7 @@ switch ($action) {
                     }
                     echo "<p class=\"centerpara\">";
                     echo "<a title=\"$strseemoredetail\" href=\"report.php?action=questions&amp;id=$id&amp;qid=$question->multi\">";
-                    survey_print_graph("id=$id&amp;qid=$question->id&amp;sid=$student&amp;type=studentmultiquestion.png");
+                    coursesat_print_graph("id=$id&amp;qid=$question->id&amp;sid=$student&amp;type=studentmultiquestion.png");
                     echo "</a></p><br />";
                 }
             }
@@ -441,12 +441,12 @@ switch ($action) {
         foreach ($questionorder as $key => $val) {
             $question = $questions[$val];
             if ($question->type == 0 or $question->type == 1) {
-                if ($answer = survey_get_user_answer($survey->id, $question->id, $user->id)) {
+                if ($answer = coursesat_get_user_answer($coursesat->id, $question->id, $user->id)) {
                     $table = new html_table();
-                    $table->head = array(get_string($question->text, "survey"));
+                    $table->head = array(get_string($question->text, "coursesat"));
                     $table->align = array("left");
                     if (!empty($question->options) && $answer->answer1 > 0) {
-                        $answers = explode(',', get_string($question->options, 'survey'));
+                        $answers = explode(',', get_string($question->options, 'coursesat'));
                         if ($answer->answer1 <= count($answers)) {
                             $table->data[] = array(s($answers[$answer->answer1 - 1])); // No html here, just plain text.
                         } else {
@@ -461,7 +461,7 @@ switch ($action) {
             }
         }
 
-        if ($rs = survey_get_analysis($survey->id, $user->id)) {
+        if ($rs = coursesat_get_analysis($coursesat->id, $user->id)) {
             $notes = $rs->notes;
         } else {
             $notes = "";
@@ -492,11 +492,11 @@ switch ($action) {
             echo html_writer::div($groupsactivitymenu, 'mb-2');
         }
 
-        require_capability('mod/survey:download', $context);
+        require_capability('mod/coursesat:download', $context);
 
-        $numusers = survey_count_responses($survey->id, $currentgroup, $groupingid);
+        $numusers = coursesat_count_responses($coursesat->id, $currentgroup, $groupingid);
         if ($numusers > 0) {
-            echo html_writer::tag('p', get_string("downloadinfo", "survey"), array('class' => 'centerpara'));
+            echo html_writer::tag('p', get_string("downloadinfo", "coursesat"), array('class' => 'centerpara'));
 
             echo $OUTPUT->container_start('reportbuttons');
             $options = array();
@@ -514,7 +514,7 @@ switch ($action) {
             echo $OUTPUT->container_end();
 
         } else {
-            echo $OUTPUT->notification(get_string("nobodyyet", "survey"), 'info', false);
+            echo $OUTPUT->notification(get_string("nobodyyet", "coursesat"), 'info', false);
         }
 
         break;

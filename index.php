@@ -5,7 +5,7 @@
 
     $id = required_param('id', PARAM_INT);    // Course Module ID
 
-    $PAGE->set_url('/mod/survey/index.php', array('id'=>$id));
+    $PAGE->set_url('/mod/coursesat/index.php', array('id'=>$id));
 
     if (!$course = $DB->get_record('course', array('id'=>$id))) {
         throw new \moodle_exception('invalidcourseid');
@@ -18,25 +18,25 @@
         'context' => context_course::instance($course->id),
         'courseid' => $course->id
     );
-    $event = \mod_survey\event\course_module_instance_list_viewed::create($params);
+    $event = \mod_coursesat\event\course_module_instance_list_viewed::create($params);
     $event->trigger();
 
-    $strsurveys = get_string("modulenameplural", "survey");
+    $strcoursesats = get_string("modulenameplural", "coursesat");
     $strname = get_string("name");
     $strstatus = get_string("status");
-    $strdone  = get_string("done", "survey");
-    $strnotdone  = get_string("notdone", "survey");
+    $strdone  = get_string("done", "coursesat");
+    $strnotdone  = get_string("notdone", "coursesat");
 
-    $PAGE->navbar->add($strsurveys);
-    $PAGE->set_title($strsurveys);
+    $PAGE->navbar->add($strcoursesats);
+    $PAGE->set_title($strcoursesats);
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
     if (!$PAGE->has_secondary_navigation()) {
-        echo $OUTPUT->heading($strsurveys);
+        echo $OUTPUT->heading($strcoursesats);
     }
 
-    if (! $surveys = get_all_instances_in_course("survey", $course)) {
-        notice(get_string('thereareno', 'moodle', $strsurveys), "../../course/view.php?id=$course->id");
+    if (! $coursesats = get_all_instances_in_course("coursesat", $course)) {
+        notice(get_string('thereareno', 'moodle', $strcoursesats), "../../course/view.php?id=$course->id");
     }
 
     $usesections = course_format_uses_sections($course->format);
@@ -52,37 +52,37 @@
 
     $currentsection = '';
 
-    foreach ($surveys as $survey) {
-        if (isloggedin() and survey_already_done($survey->id, $USER->id)) {
+    foreach ($coursesats as $coursesat) {
+        if (isloggedin() and coursesat_already_done($coursesat->id, $USER->id)) {
             $ss = $strdone;
         } else {
             $ss = $strnotdone;
         }
         $printsection = "";
         if ($usesections) {
-            if ($survey->section !== $currentsection) {
-                if ($survey->section) {
-                    $printsection = get_section_name($course, $survey->section);
+            if ($coursesat->section !== $currentsection) {
+                if ($coursesat->section) {
+                    $printsection = get_section_name($course, $coursesat->section);
                 }
                 if ($currentsection !== "") {
                     $table->data[] = 'hr';
                 }
-                $currentsection = $survey->section;
+                $currentsection = $coursesat->section;
             }
         }
         //Calculate the href
-        if (!$survey->visible) {
+        if (!$coursesat->visible) {
             //Show dimmed if the mod is hidden
-            $tt_href = "<a class=\"dimmed\" href=\"view.php?id=$survey->coursemodule\">".format_string($survey->name,true)."</a>";
+            $tt_href = "<a class=\"dimmed\" href=\"view.php?id=$coursesat->coursemodule\">".format_string($coursesat->name,true)."</a>";
         } else {
             //Show normal if the mod is visible
-            $tt_href = "<a href=\"view.php?id=$survey->coursemodule\">".format_string($survey->name,true)."</a>";
+            $tt_href = "<a href=\"view.php?id=$coursesat->coursemodule\">".format_string($coursesat->name,true)."</a>";
         }
 
         if ($usesections) {
-            $table->data[] = array ($printsection, $tt_href, "<a href=\"view.php?id=$survey->coursemodule\">$ss</a>");
+            $table->data[] = array ($printsection, $tt_href, "<a href=\"view.php?id=$coursesat->coursemodule\">$ss</a>");
         } else {
-            $table->data[] = array ($tt_href, "<a href=\"view.php?id=$survey->coursemodule\">$ss</a>");
+            $table->data[] = array ($tt_href, "<a href=\"view.php?id=$coursesat->coursemodule\">$ss</a>");
         }
     }
 

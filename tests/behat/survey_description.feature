@@ -1,4 +1,4 @@
-@mod @mod_survey
+@mod @mod_coursesat
 Feature: The default introduction is displayed when the activity description is empty
 
   Background:
@@ -11,21 +11,21 @@ Feature: The default introduction is displayed when the activity description is 
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
-    And I enable "survey" "mod" plugin
+    And I enable "coursesat" "mod" plugin
     And the following "activities" exist:
       | activity | name             | course | idnumber  | template |
-      | survey   | Test survey name | C1     | survey1   | 1        |
+      | coursesat   | Test coursesat name | C1     | coursesat1   | 1        |
 
-  Scenario: Display the default survey introduction when activity description is empty
-    Given I am on the "Test survey name" "survey activity" page logged in as "teacher1"
-    And I should see "Test survey 1"
-    When I am on the "Test survey name" "survey activity editing" page
+  Scenario: Display the default coursesat introduction when activity description is empty
+    Given I am on the "Test coursesat name" "coursesat activity" page logged in as "teacher1"
+    And I should see "Test coursesat 1"
+    When I am on the "Test coursesat name" "coursesat activity editing" page
     And I set the following fields to these values:
       | Description |  |
     And I press "Save and display"
-    Then I should see "The purpose of this survey is to help us understand"
-    And I am on the "Test survey name" "survey activity editing" page
+    Then I should see "The purpose of this coursesat is to help us understand"
+    And I am on the "Test coursesat name" "coursesat activity editing" page
     And I set the following fields to these values:
-      | Survey type | ATTLS (20 item version) |
+      | coursesat type | ATTLS (20 item version) |
     And I press "Save and display"
     And I should see "The purpose of this questionnaire is to help us evaluate"

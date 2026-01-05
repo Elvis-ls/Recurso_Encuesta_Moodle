@@ -14,7 +14,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_survey\output;
+namespace mod_coursesat\output;
 
 use moodle_url;
 use renderable;
@@ -25,7 +25,7 @@ use url_select;
 /**
  * Output the rendered elements for the tertiary nav page action
  *
- * @package mod_survey
+ * @package mod_coursesat
  * @copyright 2021 Sujith Haridasan <sujith@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -77,7 +77,7 @@ class actionbar implements renderable, templatable {
             $url = new moodle_url($this->currenturl, ['id' => $this->id, 'action' => $action]);
             $menu[$url->out(false)] = $straction;
         }
-        return new url_select($menu, $this->currenturl->out(false), null, 'surveyresponseselect');
+        return new url_select($menu, $this->currenturl->out(false), null, 'coursesatresponseselect');
     }
 
     /**
@@ -88,15 +88,15 @@ class actionbar implements renderable, templatable {
     private function get_available_reports(): array {
         global $DB;
 
-        $cm = get_coursemodule_from_id('survey', $this->id);
-        $survey = $DB->get_record("survey", ["id" => $cm->instance]);
+        $cm = get_coursemodule_from_id('coursesat', $this->id);
+        $coursesat = $DB->get_record("coursesat", ["id" => $cm->instance]);
 
         $actions = [];
-        if ($survey && ($survey->template != SURVEY_CIQ)) {
-            $actions['summary'] = get_string('summary', 'survey');
-            $actions['scales'] = get_string('scales', 'survey');
+        if ($coursesat && ($coursesat->template != coursesat_CIQ)) {
+            $actions['summary'] = get_string('summary', 'coursesat');
+            $actions['scales'] = get_string('scales', 'coursesat');
         }
-        $actions['questions'] = get_string('questions', 'survey');
+        $actions['questions'] = get_string('questions', 'coursesat');
         $actions['students'] = get_string('participants');
 
         return $actions;
@@ -116,11 +116,11 @@ class actionbar implements renderable, templatable {
             'urlselect' => $selecturl->export_for_template($output)
         ];
 
-        if (has_capability('mod/survey:download', $PAGE->cm->context)) {
-            $downloadlink = (new moodle_url('/mod/survey/report.php', ['id' => $this->id, 'action' => 'download']))->out(false);
+        if (has_capability('mod/coursesat:download', $PAGE->cm->context)) {
+            $downloadlink = (new moodle_url('/mod/coursesat/report.php', ['id' => $this->id, 'action' => 'download']))->out(false);
             $data['download'] = [
                 'link' => $downloadlink,
-                'text' => get_string('downloadresults', 'mod_survey'),
+                'text' => get_string('downloadresults', 'mod_coursesat'),
             ];
         }
         return $data;

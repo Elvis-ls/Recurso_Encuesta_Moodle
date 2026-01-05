@@ -16,20 +16,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    mod_survey
+ * @package    mod_coursesat
  * @subpackage backup-moodle2
  * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Define all the backup steps that will be used by the backup_survey_activity_task
+ * Define all the backup steps that will be used by the backup_coursesat_activity_task
  */
 
 /**
- * Define the complete survey structure for backup, with file and id annotations
+ * Define the complete coursesat structure for backup, with file and id annotations
  */
-class backup_survey_activity_structure_step extends backup_activity_structure_step {
+class backup_coursesat_activity_structure_step extends backup_activity_structure_step {
 
     protected function define_structure() {
 
@@ -37,7 +37,7 @@ class backup_survey_activity_structure_step extends backup_activity_structure_st
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated
-        $survey = new backup_nested_element('survey', array('id'), array(
+        $coursesat = new backup_nested_element('coursesat', array('id'), array(
             'name', 'intro', 'introformat', 'template',
             'questions', 'days', 'timecreated', 'timemodified', 'completionsubmit'));
 
@@ -53,27 +53,27 @@ class backup_survey_activity_structure_step extends backup_activity_structure_st
             'userid', 'notes'));
 
         // Build the tree
-        $survey->add_child($answers);
+        $coursesat->add_child($answers);
         $answers->add_child($answer);
 
-        $survey->add_child($analysis);
+        $coursesat->add_child($analysis);
         $analysis->add_child($analys);
 
         // Define sources
-        $survey->set_source_table('survey', array('id' => backup::VAR_ACTIVITYID));
+        $coursesat->set_source_table('coursesat', array('id' => backup::VAR_ACTIVITYID));
 
-        $answer->set_source_table('survey_answers', array('survey' => backup::VAR_PARENTID));
+        $answer->set_source_table('coursesat_answers', array('coursesat' => backup::VAR_PARENTID));
 
-        $analys->set_source_table('survey_analysis', array('survey' => backup::VAR_PARENTID));
+        $analys->set_source_table('coursesat_analysis', array('coursesat' => backup::VAR_PARENTID));
 
         // Define id annotations
         $answer->annotate_ids('user', 'userid');
         $analys->annotate_ids('user', 'userid');
 
         // Define file annotations
-        $survey->annotate_files('mod_survey', 'intro', null); // This file area hasn't itemid
+        $coursesat->annotate_files('mod_coursesat', 'intro', null); // This file area hasn't itemid
 
-        // Return the root element (survey), wrapped into standard activity structure
-        return $this->prepare_activity_structure($survey);
+        // Return the root element (coursesat), wrapped into standard activity structure
+        return $this->prepare_activity_structure($coursesat);
     }
 }

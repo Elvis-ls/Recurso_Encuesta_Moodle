@@ -1,5 +1,5 @@
-@mod @mod_survey @javascript
-Feature: When some answers are not selected, the survey should not be submitted
+@mod @mod_coursesat @javascript
+Feature: When some answers are not selected, the coursesat should not be submitted
     In order to submit valid responses
     As a student
     I need to fill values
@@ -14,12 +14,12 @@ Feature: When some answers are not selected, the survey should not be submitted
     And the following "course enrolments" exist:
       | user     | course | role    |
       | student1 | C1     | student |
-    And I enable "survey" "mod" plugin
+    And I enable "coursesat" "mod" plugin
 
-  Scenario: Require survey view
+  Scenario: Require coursesat view
     Given the following "activities" exist:
       | activity | name             | course |
-      | survey   | Test survey name | C1     |
-    And I am on the "Test survey name" "survey activity" page logged in as "student1"
+      | coursesat   | Test coursesat name | C1     |
+    And I am on the "Test coursesat name" "coursesat activity" page logged in as "student1"
     When I press "Submit"
     Then I should see "Some of the multiple choice questions have not been answered." in the "Error" "dialogue"

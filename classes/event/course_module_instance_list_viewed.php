@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_survey instance list viewed event.
+ * The mod_coursesat instance list viewed event.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_survey\event;
+namespace mod_coursesat\event;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * The mod_survey instance list viewed event class.
+ * The mod_coursesat instance list viewed event class.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @since      Moodle 2.7
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

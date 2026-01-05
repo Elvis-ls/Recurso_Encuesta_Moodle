@@ -15,23 +15,23 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for mod_survey lib
+ * Unit tests for mod_coursesat lib
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @category   external
  * @copyright  2015 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.0
  */
-namespace mod_survey;
+namespace mod_coursesat;
 
 defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Unit tests for mod_survey lib
+ * Unit tests for mod_coursesat lib
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @category   external
  * @copyright  2015 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -45,7 +45,7 @@ final class lib_test extends \advanced_testcase {
      */
     public static function setUpBeforeClass(): void {
         global $CFG;
-        require_once($CFG->dirroot . '/mod/survey/lib.php');
+        require_once($CFG->dirroot . '/mod/coursesat/lib.php');
         parent::setUpBeforeClass();
     }
 
@@ -54,16 +54,16 @@ final class lib_test extends \advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-        // Survey module is disabled by default, enable it for testing.
+        // coursesat module is disabled by default, enable it for testing.
         $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
-        $manager::enable_plugin('survey', 1);
+        $manager::enable_plugin('coursesat', 1);
     }
 
     /**
-     * Test survey_view
+     * Test coursesat_view
      * @return void
      */
-    public function test_survey_view(): void {
+    public function test_coursesat_view(): void {
         global $CFG;
 
         $CFG->enablecompletion = 1;
@@ -72,15 +72,15 @@ final class lib_test extends \advanced_testcase {
         $this->setAdminUser();
         // Setup test data.
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id),
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id),
                                                             array('completion' => 2, 'completionview' => 1));
-        $context = \context_module::instance($survey->cmid);
-        $cm = get_coursemodule_from_instance('survey', $survey->id);
+        $context = \context_module::instance($coursesat->cmid);
+        $cm = get_coursemodule_from_instance('coursesat', $coursesat->id);
 
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
 
-        survey_view($survey, $course, $cm, $context, 'form');
+        coursesat_view($coursesat, $course, $cm, $context, 'form');
 
         $events = $sink->get_events();
         // 2 additional events thanks to completion.
@@ -88,9 +88,9 @@ final class lib_test extends \advanced_testcase {
         $event = array_shift($events);
 
         // Checking that the event contains the expected values.
-        $this->assertInstanceOf('\mod_survey\event\course_module_viewed', $event);
+        $this->assertInstanceOf('\mod_coursesat\event\course_module_viewed', $event);
         $this->assertEquals($context, $event->get_context());
-        $moodleurl = new \moodle_url('/mod/survey/view.php', array('id' => $cm->id));
+        $moodleurl = new \moodle_url('/mod/coursesat/view.php', array('id' => $cm->id));
         $this->assertEquals($moodleurl, $event->get_url());
         $this->assertEquals('form', $event->other['viewed']);
         $this->assertEventContextNotUsed($event);
@@ -103,19 +103,19 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
-     * Test survey_order_questions
+     * Test coursesat_order_questions
      */
-    public function test_survey_order_questions(): void {
+    public function test_coursesat_order_questions(): void {
         global $DB;
 
         $this->resetAfterTest();
         $course = $this->getDataGenerator()->create_course();
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id));
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id));
 
-        $orderedquestionids = explode(',', $survey->questions);
-        $surveyquestions = $DB->get_records_list("survey_questions", "id", $orderedquestionids);
+        $orderedquestionids = explode(',', $coursesat->questions);
+        $coursesatquestions = $DB->get_records_list("coursesat_questions", "id", $orderedquestionids);
 
-        $questionsordered = survey_order_questions($surveyquestions, $orderedquestionids);
+        $questionsordered = coursesat_order_questions($coursesatquestions, $orderedquestionids);
 
         // Check one by one the correct order.
         for ($i = 0; $i < count($orderedquestionids); $i++) {
@@ -124,9 +124,9 @@ final class lib_test extends \advanced_testcase {
     }
 
     /**
-     * Test survey_save_answers
+     * Test coursesat_save_answers
      */
-    public function test_survey_save_answers(): void {
+    public function test_coursesat_save_answers(): void {
         global $DB;
 
         $this->resetAfterTest();
@@ -134,17 +134,17 @@ final class lib_test extends \advanced_testcase {
 
         // Setup test data.
         $course = $this->getDataGenerator()->create_course();
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id));
-        $context = \context_module::instance($survey->cmid);
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id));
+        $context = \context_module::instance($coursesat->cmid);
 
         // Build our questions and responses array.
         $realquestions = array();
-        $questions = survey_get_questions($survey);
+        $questions = coursesat_get_questions($coursesat);
         $i = 5;
         foreach ($questions as $q) {
             if ($q->type > 0) {
                 if ($q->multi) {
-                    $subquestions = survey_get_subquestions($q);
+                    $subquestions = coursesat_get_subquestions($q);
                     foreach ($subquestions as $sq) {
                         $key = 'q' . $sq->id;
                         $realquestions[$key] = $i % 5 + 1;
@@ -159,10 +159,10 @@ final class lib_test extends \advanced_testcase {
         }
 
         $sink = $this->redirectEvents();
-        survey_save_answers($survey, $realquestions, $course, $context);
+        coursesat_save_answers($coursesat, $realquestions, $course, $context);
 
         // Check the stored answers, they must match.
-        $dbanswers = $DB->get_records_menu('survey_answers', array('survey' => $survey->id), '', 'question, answer1');
+        $dbanswers = $DB->get_records_menu('coursesat_answers', array('coursesat' => $coursesat->id), '', 'question, answer1');
         foreach ($realquestions as $key => $value) {
             $id = str_replace('q', '', $key);
             $this->assertEquals($value, $dbanswers[$id]);
@@ -174,28 +174,28 @@ final class lib_test extends \advanced_testcase {
         $event = array_shift($events);
 
         // Checking that the event contains the expected values.
-        $this->assertInstanceOf('\mod_survey\event\response_submitted', $event);
+        $this->assertInstanceOf('\mod_coursesat\event\response_submitted', $event);
         $this->assertEquals($context, $event->get_context());
-        $this->assertEquals($survey->id, $event->other['surveyid']);
+        $this->assertEquals($coursesat->id, $event->other['coursesatid']);
     }
 
-    public function test_survey_core_calendar_provide_event_action(): void {
+    public function test_coursesat_core_calendar_provide_event_action(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
         // Create the activity.
         $course = $this->getDataGenerator()->create_course();
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id));
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $survey->id,
+        $event = $this->create_action_event($course->id, $coursesat->id,
             \core_completion\api::COMPLETION_EVENT_TYPE_DATE_COMPLETION_EXPECTED);
 
         // Create an action factory.
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_survey_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_coursesat_core_calendar_provide_event_action($event, $factory);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
@@ -205,7 +205,7 @@ final class lib_test extends \advanced_testcase {
         $this->assertTrue($actionevent->is_actionable());
     }
 
-    public function test_survey_core_calendar_provide_event_action_for_user(): void {
+    public function test_coursesat_core_calendar_provide_event_action_for_user(): void {
         global $CFG;
 
         $this->resetAfterTest();
@@ -213,13 +213,13 @@ final class lib_test extends \advanced_testcase {
 
         // Create the activity.
         $course = $this->getDataGenerator()->create_course();
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id));
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id));
 
         // Create a student and enrol into the course.
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $survey->id,
+        $event = $this->create_action_event($course->id, $coursesat->id,
             \core_completion\api::COMPLETION_EVENT_TYPE_DATE_COMPLETION_EXPECTED);
 
         // Now log out.
@@ -230,7 +230,7 @@ final class lib_test extends \advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event for the student.
-        $actionevent = mod_survey_core_calendar_provide_event_action($event, $factory, $student->id);
+        $actionevent = mod_coursesat_core_calendar_provide_event_action($event, $factory, $student->id);
 
         // Confirm the event was decorated.
         $this->assertInstanceOf('\core_calendar\local\event\value_objects\action', $actionevent);
@@ -240,7 +240,7 @@ final class lib_test extends \advanced_testcase {
         $this->assertTrue($actionevent->is_actionable());
     }
 
-    public function test_survey_core_calendar_provide_event_action_as_non_user(): void {
+    public function test_coursesat_core_calendar_provide_event_action_as_non_user(): void {
         global $CFG;
 
         $this->resetAfterTest();
@@ -248,10 +248,10 @@ final class lib_test extends \advanced_testcase {
 
         // Create the activity.
         $course = $this->getDataGenerator()->create_course();
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id));
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id));
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $survey->id,
+        $event = $this->create_action_event($course->id, $coursesat->id,
             \core_completion\api::COMPLETION_EVENT_TYPE_DATE_COMPLETION_EXPECTED);
 
         // Log out the user and set force login to true.
@@ -262,13 +262,13 @@ final class lib_test extends \advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_survey_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_coursesat_core_calendar_provide_event_action($event, $factory);
 
         // Ensure result was null.
         $this->assertNull($actionevent);
     }
 
-    public function test_survey_core_calendar_provide_event_action_already_completed(): void {
+    public function test_coursesat_core_calendar_provide_event_action_already_completed(): void {
         global $CFG;
 
         $this->resetAfterTest();
@@ -278,14 +278,14 @@ final class lib_test extends \advanced_testcase {
 
         // Create the activity.
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id),
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id),
             array('completion' => 2, 'completionview' => 1, 'completionexpected' => time() + DAYSECS));
 
         // Get some additional data.
-        $cm = get_coursemodule_from_instance('survey', $survey->id);
+        $cm = get_coursemodule_from_instance('coursesat', $coursesat->id);
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $survey->id,
+        $event = $this->create_action_event($course->id, $coursesat->id,
             \core_completion\api::COMPLETION_EVENT_TYPE_DATE_COMPLETION_EXPECTED);
 
         // Mark the activity as completed.
@@ -296,13 +296,13 @@ final class lib_test extends \advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event.
-        $actionevent = mod_survey_core_calendar_provide_event_action($event, $factory);
+        $actionevent = mod_coursesat_core_calendar_provide_event_action($event, $factory);
 
         // Ensure result was null.
         $this->assertNull($actionevent);
     }
 
-    public function test_survey_core_calendar_provide_event_action_already_completed_for_user(): void {
+    public function test_coursesat_core_calendar_provide_event_action_already_completed_for_user(): void {
         global $CFG;
 
         $this->resetAfterTest();
@@ -312,7 +312,7 @@ final class lib_test extends \advanced_testcase {
 
         // Create the activity.
         $course = $this->getDataGenerator()->create_course(array('enablecompletion' => 1));
-        $survey = $this->getDataGenerator()->create_module('survey', array('course' => $course->id),
+        $coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $course->id),
             array('completion' => 2, 'completionview' => 1, 'completionexpected' => time() + DAYSECS));
 
         // Create 2 students and enrol them into the course.
@@ -320,10 +320,10 @@ final class lib_test extends \advanced_testcase {
         $student2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
         // Get some additional data.
-        $cm = get_coursemodule_from_instance('survey', $survey->id);
+        $cm = get_coursemodule_from_instance('coursesat', $coursesat->id);
 
         // Create a calendar event.
-        $event = $this->create_action_event($course->id, $survey->id,
+        $event = $this->create_action_event($course->id, $coursesat->id,
             \core_completion\api::COMPLETION_EVENT_TYPE_DATE_COMPLETION_EXPECTED);
 
         // Mark the activity as completed for the $student1.
@@ -337,7 +337,7 @@ final class lib_test extends \advanced_testcase {
         $factory = new \core_calendar\action_factory();
 
         // Decorate action event for $student1.
-        $actionevent = mod_survey_core_calendar_provide_event_action($event, $factory, $student1->id);
+        $actionevent = mod_coursesat_core_calendar_provide_event_action($event, $factory, $student1->id);
 
         // Ensure result was null.
         $this->assertNull($actionevent);
@@ -354,7 +354,7 @@ final class lib_test extends \advanced_testcase {
     private function create_action_event($courseid, $instanceid, $eventtype) {
         $event = new \stdClass();
         $event->name = 'Calendar event';
-        $event->modulename  = 'survey';
+        $event->modulename  = 'coursesat';
         $event->courseid = $courseid;
         $event->instance = $instanceid;
         $event->type = CALENDAR_EVENT_TYPE_ACTION;
@@ -369,24 +369,24 @@ final class lib_test extends \advanced_testcase {
      * This function should work given either an instance of the module (cm_info), such as when checking the active rules,
      * or if passed a stdClass of similar structure, such as when checking the the default completion settings for a mod type.
      */
-    public function test_mod_survey_completion_get_active_rule_descriptions(): void {
+    public function test_mod_coursesat_completion_get_active_rule_descriptions(): void {
         $this->resetAfterTest();
         $this->setAdminUser();
 
         // Two activities, both with automatic completion. One has the 'completionsubmit' rule, one doesn't.
         $course = $this->getDataGenerator()->create_course(['enablecompletion' => 2]);
-        $survey1 = $this->getDataGenerator()->create_module('survey', [
+        $coursesat1 = $this->getDataGenerator()->create_module('coursesat', [
             'course' => $course->id,
             'completion' => 2,
             'completionsubmit' => 1,
         ]);
-        $survey2 = $this->getDataGenerator()->create_module('survey', [
+        $coursesat2 = $this->getDataGenerator()->create_module('coursesat', [
             'course' => $course->id,
             'completion' => 2,
             'completionsubmit' => 0,
         ]);
-        $cm1 = \cm_info::create(get_coursemodule_from_instance('survey', $survey1->id));
-        $cm2 = \cm_info::create(get_coursemodule_from_instance('survey', $survey2->id));
+        $cm1 = \cm_info::create(get_coursemodule_from_instance('coursesat', $coursesat1->id));
+        $cm2 = \cm_info::create(get_coursemodule_from_instance('coursesat', $coursesat2->id));
 
         // Data for the stdClass input type.
         // This type of input would occur when checking the default completion rules for an activity type, where we don't have
@@ -395,10 +395,10 @@ final class lib_test extends \advanced_testcase {
         $moddefaults->customdata = ['customcompletionrules' => ['completionsubmit' => 1]];
         $moddefaults->completion = 2;
 
-        $activeruledescriptions = [get_string('completionsubmit', 'survey')];
-        $this->assertEquals(mod_survey_get_completion_active_rule_descriptions($cm1), $activeruledescriptions);
-        $this->assertEquals(mod_survey_get_completion_active_rule_descriptions($cm2), []);
-        $this->assertEquals(mod_survey_get_completion_active_rule_descriptions($moddefaults), $activeruledescriptions);
-        $this->assertEquals(mod_survey_get_completion_active_rule_descriptions(new \stdClass()), []);
+        $activeruledescriptions = [get_string('completionsubmit', 'coursesat')];
+        $this->assertEquals(mod_coursesat_get_completion_active_rule_descriptions($cm1), $activeruledescriptions);
+        $this->assertEquals(mod_coursesat_get_completion_active_rule_descriptions($cm2), []);
+        $this->assertEquals(mod_coursesat_get_completion_active_rule_descriptions($moddefaults), $activeruledescriptions);
+        $this->assertEquals(mod_coursesat_get_completion_active_rule_descriptions(new \stdClass()), []);
     }
 }

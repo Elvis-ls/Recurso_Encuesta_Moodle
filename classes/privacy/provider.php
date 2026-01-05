@@ -17,13 +17,13 @@
 /**
  * Data provider.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2018 Frédéric Massart
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_survey\privacy;
+namespace mod_coursesat\privacy;
 defined('MOODLE_INTERNAL') || die();
 
 use context;
@@ -37,12 +37,12 @@ use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
 
-require_once($CFG->dirroot . '/mod/survey/lib.php');
+require_once($CFG->dirroot . '/mod/coursesat/lib.php');
 
 /**
  * Data provider class.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2018 Frédéric Massart
  * @author     Frédéric Massart <fred@branchup.tech>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -59,7 +59,7 @@ class provider implements
      * @return collection A listing of user data stored through this system.
      */
     public static function get_metadata(collection $collection): collection {
-        $collection->add_database_table('survey_answers', [
+        $collection->add_database_table('coursesat_answers', [
             'userid' => 'privacy:metadata:answers:userid',
             'question' => 'privacy:metadata:answers:question',
             'answer1' => 'privacy:metadata:answers:answer1',
@@ -67,7 +67,7 @@ class provider implements
             'time' => 'privacy:metadata:answers:time',
         ], 'privacy:metadata:answers');
 
-        $collection->add_database_table('survey_analysis', [
+        $collection->add_database_table('coursesat_analysis', [
             'userid' => 'privacy:metadata:analysis:userid',
             'notes' => 'privacy:metadata:analysis:notes',
         ], 'privacy:metadata:analysis');
@@ -87,27 +87,27 @@ class provider implements
         // While we should not have an analysis without answers, it's safer to gather contexts by looking at both tables.
         $sql = "
             SELECT DISTINCT ctx.id
-              FROM {survey} s
+              FROM {coursesat} s
               JOIN {modules} m
-                ON m.name = :survey
+                ON m.name = :coursesat
               JOIN {course_modules} cm
                 ON cm.instance = s.id
                AND cm.module = m.id
               JOIN {context} ctx
                 ON ctx.instanceid = cm.id
                AND ctx.contextlevel = :modulelevel
-         LEFT JOIN {survey_answers} sa
-                ON sa.survey = s.id
+         LEFT JOIN {coursesat_answers} sa
+                ON sa.coursesat = s.id
                AND sa.userid = :userid1
-         LEFT JOIN {survey_analysis} sy
-                ON sy.survey = s.id
+         LEFT JOIN {coursesat_analysis} sy
+                ON sy.coursesat = s.id
                AND sy.userid = :userid2
              WHERE s.template <> 0
                AND (sa.id IS NOT NULL
                 OR sy.id IS NOT NULL)";
 
         $contextlist->add_from_sql($sql, [
-            'survey' => 'survey',
+            'coursesat' => 'coursesat',
             'modulelevel' => CONTEXT_MODULE,
             'userid1' => $userid,
             'userid2' => $userid,
@@ -129,24 +129,24 @@ class provider implements
         }
 
         $params = [
-            'survey' => 'survey',
+            'coursesat' => 'coursesat',
             'modulelevel' => CONTEXT_MODULE,
             'contextid' => $context->id,
         ];
 
         $sql = "
             SELECT sa.userid
-              FROM {survey} s
+              FROM {coursesat} s
               JOIN {modules} m
-                ON m.name = :survey
+                ON m.name = :coursesat
               JOIN {course_modules} cm
                 ON cm.instance = s.id
                AND cm.module = m.id
               JOIN {context} ctx
                 ON ctx.instanceid = cm.id
                AND ctx.contextlevel = :modulelevel
-              JOIN {survey_answers} sa
-                ON sa.survey = s.id
+              JOIN {coursesat_answers} sa
+                ON sa.coursesat = s.id
              WHERE ctx.id = :contextid
                AND s.template <> 0";
 
@@ -154,17 +154,17 @@ class provider implements
 
         $sql = "
             SELECT sy.userid
-              FROM {survey} s
+              FROM {coursesat} s
               JOIN {modules} m
-                ON m.name = :survey
+                ON m.name = :coursesat
               JOIN {course_modules} cm
                 ON cm.instance = s.id
                AND cm.module = m.id
               JOIN {context} ctx
                 ON ctx.instanceid = cm.id
                AND ctx.contextlevel = :modulelevel
-              JOIN {survey_analysis} sy
-                ON sy.survey = s.id
+              JOIN {coursesat_analysis} sy
+                ON sy.coursesat = s.id
              WHERE ctx.id = :contextid
                AND s.template <> 0";
 
@@ -203,24 +203,24 @@ class provider implements
                    sq.options as qoptions,
                    sq.type as qtype,
                    cm.id as cmid
-              FROM {survey_answers} sa
-              JOIN {survey_questions} sq
+              FROM {coursesat_answers} sa
+              JOIN {coursesat_questions} sq
                 ON sq.id = sa.question
-              JOIN {survey} s
-                ON s.id = sa.survey
+              JOIN {coursesat} s
+                ON s.id = sa.coursesat
               JOIN {modules} m
-                ON m.name = :survey
+                ON m.name = :coursesat
               JOIN {course_modules} cm
                 ON cm.instance = s.id
                AND cm.module = m.id
              WHERE cm.id $insql
                AND sa.userid = :userid
           ORDER BY s.id, sq.id";
-        $params = array_merge($inparams, ['survey' => 'survey', 'userid' => $userid]);
+        $params = array_merge($inparams, ['coursesat' => 'coursesat', 'userid' => $userid]);
 
         $recordset = $DB->get_recordset_sql($sql, $params);
         static::recordset_loop_and_export($recordset, 'cmid', [], function($carry, $record) {
-            $q = survey_translate_question((object) [
+            $q = coursesat_translate_question((object) [
                 'text' => $record->qtext,
                 'shorttext' => $record->qshorttext,
                 'intro' => $record->qintro,
@@ -252,18 +252,18 @@ class provider implements
         // Export the analysis.
         $sql = "
             SELECT sy.*, cm.id as cmid
-              FROM {survey_analysis} sy
-              JOIN {survey} s
-                ON s.id = sy.survey
+              FROM {coursesat_analysis} sy
+              JOIN {coursesat} s
+                ON s.id = sy.coursesat
               JOIN {modules} m
-                ON m.name = :survey
+                ON m.name = :coursesat
               JOIN {course_modules} cm
                 ON cm.instance = s.id
                AND cm.module = m.id
              WHERE cm.id $insql
                AND sy.userid = :userid
           ORDER BY s.id";
-        $params = array_merge($inparams, ['survey' => 'survey', 'userid' => $userid]);
+        $params = array_merge($inparams, ['coursesat' => 'coursesat', 'userid' => $userid]);
 
         $recordset = $DB->get_recordset_sql($sql, $params);
         static::recordset_loop_and_export($recordset, 'cmid', null, function($carry, $record) {
@@ -271,7 +271,7 @@ class provider implements
             return $carry;
         }, function($cmid, $data) {
             $context = context_module::instance($cmid);
-            writer::with_context($context)->export_related_data([], 'survey_analysis', (object) $data);
+            writer::with_context($context)->export_related_data([], 'coursesat_analysis', (object) $data);
         });
     }
 
@@ -287,9 +287,9 @@ class provider implements
             return;
         }
 
-        if ($surveyid = static::get_survey_id_from_context($context)) {
-            $DB->delete_records('survey_answers', ['survey' => $surveyid]);
-            $DB->delete_records('survey_analysis', ['survey' => $surveyid]);
+        if ($coursesatid = static::get_coursesat_id_from_context($context)) {
+            $DB->delete_records('coursesat_answers', ['coursesat' => $coursesatid]);
+            $DB->delete_records('coursesat_analysis', ['coursesat' => $coursesatid]);
         }
     }
 
@@ -312,25 +312,25 @@ class provider implements
             return;
         }
 
-        // Fetch the survey IDs.
+        // Fetch the coursesat IDs.
         list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
         $sql = "
             SELECT s.id
-              FROM {survey} s
+              FROM {coursesat} s
               JOIN {modules} m
-                ON m.name = :survey
+                ON m.name = :coursesat
               JOIN {course_modules} cm
                 ON cm.instance = s.id
                AND cm.module = m.id
              WHERE cm.id $insql";
-        $params = array_merge($inparams, ['survey' => 'survey']);
-        $surveyids = $DB->get_fieldset_sql($sql, $params);
+        $params = array_merge($inparams, ['coursesat' => 'coursesat']);
+        $coursesatids = $DB->get_fieldset_sql($sql, $params);
 
         // Delete all the things.
-        list($insql, $inparams) = $DB->get_in_or_equal($surveyids, SQL_PARAMS_NAMED);
+        list($insql, $inparams) = $DB->get_in_or_equal($coursesatids, SQL_PARAMS_NAMED);
         $params = array_merge($inparams, ['userid' => $userid]);
-        $DB->delete_records_select('survey_answers', "survey $insql AND userid = :userid", $params);
-        $DB->delete_records_select('survey_analysis', "survey $insql AND userid = :userid", $params);
+        $DB->delete_records_select('coursesat_answers', "coursesat $insql AND userid = :userid", $params);
+        $DB->delete_records_select('coursesat_analysis', "coursesat $insql AND userid = :userid", $params);
     }
 
     /**
@@ -346,39 +346,39 @@ class provider implements
             return;
         }
 
-        // Fetch the survey ID.
+        // Fetch the coursesat ID.
         $sql = "
             SELECT s.id
-              FROM {survey} s
+              FROM {coursesat} s
               JOIN {modules} m
-                ON m.name = :survey
+                ON m.name = :coursesat
               JOIN {course_modules} cm
                 ON cm.instance = s.id
                AND cm.module = m.id
              WHERE cm.id = :cmid";
         $params = [
-            'survey' => 'survey',
+            'coursesat' => 'coursesat',
             'cmid' => $context->instanceid,
             ];
-        $surveyid = $DB->get_field_sql($sql, $params);
+        $coursesatid = $DB->get_field_sql($sql, $params);
         $userids = $userlist->get_userids();
 
         // Delete all the things.
         list($insql, $params) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
-        $params['surveyid'] = $surveyid;
+        $params['coursesatid'] = $coursesatid;
 
-        $DB->delete_records_select('survey_answers', "survey = :surveyid AND userid {$insql}", $params);
-        $DB->delete_records_select('survey_analysis', "survey = :surveyid AND userid {$insql}", $params);
+        $DB->delete_records_select('coursesat_answers', "coursesat = :coursesatid AND userid {$insql}", $params);
+        $DB->delete_records_select('coursesat_analysis', "coursesat = :coursesatid AND userid {$insql}", $params);
     }
 
     /**
-     * Get a survey ID from its context.
+     * Get a coursesat ID from its context.
      *
      * @param context_module $context The module context.
      * @return int
      */
-    protected static function get_survey_id_from_context(context_module $context) {
-        $cm = get_coursemodule_from_id('survey', $context->instanceid);
+    protected static function get_coursesat_id_from_context(context_module $context) {
+        $cm = get_coursemodule_from_id('coursesat', $context->instanceid);
         return $cm ? (int) $cm->instance : 0;
     }
     /**

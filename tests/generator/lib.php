@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * mod_survey data generator.
+ * mod_coursesat data generator.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @category   test
  * @copyright  2013 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,14 +26,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * mod_survey data generator class.
+ * mod_coursesat data generator class.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @category   test
  * @copyright  2013 Marina Glancy
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_survey_generator extends testing_module_generator {
+class mod_coursesat_generator extends testing_module_generator {
 
     /**
      * Cached list of available templates.
@@ -50,10 +50,10 @@ class mod_survey_generator extends testing_module_generator {
         global $DB;
 
         if ($this->templates === null) {
-            $this->templates = $DB->get_records_menu('survey', array('template' => 0), 'name', 'id, name');
+            $this->templates = $DB->get_records_menu('coursesat', array('template' => 0), 'name', 'id, name');
         }
         if (empty($this->templates)) {
-            throw new moodle_exception('cannotfindsurveytmpt', 'survey');
+            throw new moodle_exception('cannotfindcoursesattmpt', 'coursesat');
         }
         $record = (array)$record;
         if (isset($record['template']) && !is_number($record['template'])) {
@@ -61,10 +61,10 @@ class mod_survey_generator extends testing_module_generator {
             $record['template'] = array_search($record['template'], $this->templates);
         }
         if (isset($record['template']) && !array_key_exists($record['template'], $this->templates)) {
-            throw new moodle_exception('cannotfindsurveytmpt', 'survey');
+            throw new moodle_exception('cannotfindcoursesattmpt', 'coursesat');
         }
 
-        // Add default values for survey.
+        // Add default values for coursesat.
         if (!isset($record['template'])) {
             reset($this->templates);
             $record['template'] = key($this->templates);

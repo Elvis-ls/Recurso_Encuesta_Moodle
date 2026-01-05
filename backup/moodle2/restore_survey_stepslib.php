@@ -16,37 +16,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    mod_survey
+ * @package    mod_coursesat
  * @subpackage backup-moodle2
  * @copyright  2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Define all the restore steps that will be used by the restore_survey_activity_task
+ * Define all the restore steps that will be used by the restore_coursesat_activity_task
  */
 
 /**
- * Structure step to restore one survey activity
+ * Structure step to restore one coursesat activity
  */
-class restore_survey_activity_structure_step extends restore_activity_structure_step {
+class restore_coursesat_activity_structure_step extends restore_activity_structure_step {
 
     protected function define_structure() {
 
         $paths = array();
         $userinfo = $this->get_setting_value('userinfo');
 
-        $paths[] = new restore_path_element('survey', '/activity/survey');
+        $paths[] = new restore_path_element('coursesat', '/activity/coursesat');
         if ($userinfo) {
-            $paths[] = new restore_path_element('survey_answer', '/activity/survey/answers/answer');
-            $paths[] = new restore_path_element('survey_analys', '/activity/survey/analysis/analys');
+            $paths[] = new restore_path_element('coursesat_answer', '/activity/coursesat/answers/answer');
+            $paths[] = new restore_path_element('coursesat_analys', '/activity/coursesat/analysis/analys');
         }
 
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
 
-    protected function process_survey($data) {
+    protected function process_coursesat($data) {
         global $DB;
 
         $data = (object)$data;
@@ -56,40 +56,40 @@ class restore_survey_activity_structure_step extends restore_activity_structure_
         // Any changes to the list of dates that needs to be rolled should be same during course restore and course reset.
         // See MDL-9367.
 
-        // insert the survey record
-        $newitemid = $DB->insert_record('survey', $data);
+        // insert the coursesat record
+        $newitemid = $DB->insert_record('coursesat', $data);
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
 
-    protected function process_survey_analys($data) {
+    protected function process_coursesat_analys($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
-        $data->survey = $this->get_new_parentid('survey');
+        $data->coursesat = $this->get_new_parentid('coursesat');
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $newitemid = $DB->insert_record('survey_analysis', $data);
+        $newitemid = $DB->insert_record('coursesat_analysis', $data);
         // No need to save this mapping as far as nothing depend on it
         // (child paths, file areas nor links decoder)
     }
 
-    protected function process_survey_answer($data) {
+    protected function process_coursesat_answer($data) {
         global $DB;
 
         $data = (object)$data;
         $oldid = $data->id;
-        $data->survey = $this->get_new_parentid('survey');
+        $data->coursesat = $this->get_new_parentid('coursesat');
         $data->userid = $this->get_mappingid('user', $data->userid);
 
-        $newitemid = $DB->insert_record('survey_answers', $data);
+        $newitemid = $DB->insert_record('coursesat_answers', $data);
         // No need to save this mapping as far as nothing depend on it
         // (child paths, file areas nor links decoder)
     }
 
     protected function after_execute() {
-        // Add survey related files, no need to match by itemname (just internally handled context)
-        $this->add_related_files('mod_survey', 'intro', null);
+        // Add coursesat related files, no need to match by itemname (just internally handled context)
+        $this->add_related_files('mod_coursesat', 'intro', null);
     }
 }

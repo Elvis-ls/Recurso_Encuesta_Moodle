@@ -14,23 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace mod_survey;
+namespace mod_coursesat;
 
 use core_external\external_api;
 use externallib_advanced_testcase;
-use mod_survey_external;
+use mod_coursesat_external;
 
 defined('MOODLE_INTERNAL') || die();
 
 global $CFG;
 
 require_once($CFG->dirroot . '/webservice/tests/helpers.php');
-require_once($CFG->dirroot . '/mod/survey/lib.php');
+require_once($CFG->dirroot . '/mod/coursesat/lib.php');
 
 /**
- * Survey module external functions tests
+ * coursesat module external functions tests
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @category   external
  * @copyright  2015 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -42,7 +42,7 @@ final class externallib_test extends externallib_advanced_testcase {
     protected $course;
 
     /** @var \stdClass activity record. */
-    protected $survey;
+    protected $coursesat;
 
     /** @var \context_module context instance. */
     protected $context;
@@ -71,15 +71,15 @@ final class externallib_test extends externallib_advanced_testcase {
         $this->resetAfterTest();
         $this->setAdminUser();
 
-        // Survey module is disabled by default, enable it for testing.
+        // coursesat module is disabled by default, enable it for testing.
         $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
-        $manager::enable_plugin('survey', 1);
+        $manager::enable_plugin('coursesat', 1);
 
         // Setup test data.
         $this->course = $this->getDataGenerator()->create_course();
-        $this->survey = $this->getDataGenerator()->create_module('survey', array('course' => $this->course->id));
-        $this->context = \context_module::instance($this->survey->cmid);
-        $this->cm = get_coursemodule_from_instance('survey', $this->survey->id);
+        $this->coursesat = $this->getDataGenerator()->create_module('coursesat', array('course' => $this->course->id));
+        $this->context = \context_module::instance($this->coursesat->cmid);
+        $this->cm = get_coursemodule_from_instance('coursesat', $this->coursesat->id);
 
         // Create users.
         $this->student = self::getDataGenerator()->create_user();
@@ -94,20 +94,20 @@ final class externallib_test extends externallib_advanced_testcase {
 
 
     /*
-     * Test get surveys by courses
+     * Test get coursesats by courses
      */
-    public function test_mod_survey_get_surveys_by_courses(): void {
+    public function test_mod_coursesat_get_coursesats_by_courses(): void {
         global $DB;
 
         // Create additional course.
         $course2 = self::getDataGenerator()->create_course();
 
-        // Second survey.
+        // Second coursesat.
         $record = new \stdClass();
         $record->course = $course2->id;
-        $survey2 = self::getDataGenerator()->create_module('survey', $record);
+        $coursesat2 = self::getDataGenerator()->create_module('coursesat', $record);
         // Force empty intro.
-        $DB->set_field('survey', 'intro', '', array('id' => $survey2->id));
+        $DB->set_field('coursesat', 'intro', '', array('id' => $coursesat2->id));
 
         // Execute real Moodle enrolment as we'll call unenrol() method on the instance later.
         $enrol = enrol_get_plugin('manual');
@@ -122,68 +122,68 @@ final class externallib_test extends externallib_advanced_testcase {
 
         self::setUser($this->student);
 
-        $returndescription = mod_survey_external::get_surveys_by_courses_returns();
+        $returndescription = mod_coursesat_external::get_coursesats_by_courses_returns();
 
         // Create what we expect to be returned when querying the two courses.
         // First for the student user.
         $expectedfields = array('id', 'coursemodule', 'course', 'name', 'intro', 'introformat', 'introfiles', 'lang',
-                'template', 'days', 'questions', 'surveydone');
+                'template', 'days', 'questions', 'coursesatdone');
 
         // Add expected coursemodule and data.
-        $survey1 = $this->survey;
-        $survey1->coursemodule = $survey1->cmid;
-        $survey1->introformat = 1;
-        $survey1->surveydone = 0;
-        $survey1->section = 0;
-        $survey1->visible = true;
-        $survey1->groupmode = 0;
-        $survey1->groupingid = 0;
-        $survey1->introfiles = [];
-        $survey1->lang = '';
+        $coursesat1 = $this->coursesat;
+        $coursesat1->coursemodule = $coursesat1->cmid;
+        $coursesat1->introformat = 1;
+        $coursesat1->coursesatdone = 0;
+        $coursesat1->section = 0;
+        $coursesat1->visible = true;
+        $coursesat1->groupmode = 0;
+        $coursesat1->groupingid = 0;
+        $coursesat1->introfiles = [];
+        $coursesat1->lang = '';
 
-        $survey2->coursemodule = $survey2->cmid;
-        $survey2->introformat = 1;
-        $survey2->surveydone = 0;
-        $survey2->section = 0;
-        $survey2->visible = true;
-        $survey2->groupmode = 0;
-        $survey2->groupingid = 0;
-        $tempo = $DB->get_field("survey", "intro", array("id" => $survey2->template));
-        $survey2->intro = nl2br(get_string($tempo, "survey"));
-        $survey2->introfiles = [];
-        $survey2->lang = '';
+        $coursesat2->coursemodule = $coursesat2->cmid;
+        $coursesat2->introformat = 1;
+        $coursesat2->coursesatdone = 0;
+        $coursesat2->section = 0;
+        $coursesat2->visible = true;
+        $coursesat2->groupmode = 0;
+        $coursesat2->groupingid = 0;
+        $tempo = $DB->get_field("coursesat", "intro", array("id" => $coursesat2->template));
+        $coursesat2->intro = nl2br(get_string($tempo, "coursesat"));
+        $coursesat2->introfiles = [];
+        $coursesat2->lang = '';
 
         foreach ($expectedfields as $field) {
-            $expected1[$field] = $survey1->{$field};
-            $expected2[$field] = $survey2->{$field};
+            $expected1[$field] = $coursesat1->{$field};
+            $expected2[$field] = $coursesat2->{$field};
         }
 
-        $expectedsurveys = array($expected2, $expected1);
+        $expectedcoursesats = array($expected2, $expected1);
 
         // Call the external function passing course ids.
-        $result = mod_survey_external::get_surveys_by_courses(array($course2->id, $this->course->id));
+        $result = mod_coursesat_external::get_coursesats_by_courses(array($course2->id, $this->course->id));
         $result = external_api::clean_returnvalue($returndescription, $result);
 
-        $this->assertEquals($expectedsurveys, $result['surveys']);
+        $this->assertEquals($expectedcoursesats, $result['coursesats']);
         $this->assertCount(0, $result['warnings']);
 
         // Call the external function without passing course id.
-        $result = mod_survey_external::get_surveys_by_courses();
+        $result = mod_coursesat_external::get_coursesats_by_courses();
         $result = external_api::clean_returnvalue($returndescription, $result);
-        $this->assertEquals($expectedsurveys, $result['surveys']);
+        $this->assertEquals($expectedcoursesats, $result['coursesats']);
         $this->assertCount(0, $result['warnings']);
 
-        // Unenrol user from second course and alter expected surveys.
+        // Unenrol user from second course and alter expected coursesats.
         $enrol->unenrol_user($instance2, $this->student->id);
-        array_shift($expectedsurveys);
+        array_shift($expectedcoursesats);
 
         // Call the external function without passing course id.
-        $result = mod_survey_external::get_surveys_by_courses();
+        $result = mod_coursesat_external::get_coursesats_by_courses();
         $result = external_api::clean_returnvalue($returndescription, $result);
-        $this->assertEquals($expectedsurveys, $result['surveys']);
+        $this->assertEquals($expectedcoursesats, $result['coursesats']);
 
         // Call for the second course we unenrolled the user from, expected warning.
-        $result = mod_survey_external::get_surveys_by_courses(array($course2->id));
+        $result = mod_coursesat_external::get_coursesats_by_courses(array($course2->id));
         $this->assertCount(1, $result['warnings']);
         $this->assertEquals('1', $result['warnings'][0]['warningcode']);
         $this->assertEquals($course2->id, $result['warnings'][0]['itemid']);
@@ -194,42 +194,42 @@ final class externallib_test extends externallib_advanced_testcase {
         $additionalfields = array('timecreated', 'timemodified', 'section', 'visible', 'groupmode', 'groupingid');
 
         foreach ($additionalfields as $field) {
-            $expectedsurveys[0][$field] = $survey1->{$field};
+            $expectedcoursesats[0][$field] = $coursesat1->{$field};
         }
 
-        $result = mod_survey_external::get_surveys_by_courses();
+        $result = mod_coursesat_external::get_coursesats_by_courses();
         $result = external_api::clean_returnvalue($returndescription, $result);
-        $this->assertEquals($expectedsurveys, $result['surveys']);
+        $this->assertEquals($expectedcoursesats, $result['coursesats']);
 
         // Admin also should get all the information.
         self::setAdminUser();
 
-        $result = mod_survey_external::get_surveys_by_courses(array($this->course->id));
+        $result = mod_coursesat_external::get_coursesats_by_courses(array($this->course->id));
         $result = external_api::clean_returnvalue($returndescription, $result);
-        $this->assertEquals($expectedsurveys, $result['surveys']);
+        $this->assertEquals($expectedcoursesats, $result['coursesats']);
 
         // Now, prohibit capabilities.
         $this->setUser($this->student);
         $contextcourse1 = \context_course::instance($this->course->id);
-        // Prohibit capability = mod/survey:participate on Course1 for students.
-        assign_capability('mod/survey:participate', CAP_PROHIBIT, $this->studentrole->id, $contextcourse1->id);
+        // Prohibit capability = mod/coursesat:participate on Course1 for students.
+        assign_capability('mod/coursesat:participate', CAP_PROHIBIT, $this->studentrole->id, $contextcourse1->id);
         accesslib_clear_all_caches_for_unit_testing();
 
-        $surveys = mod_survey_external::get_surveys_by_courses(array($this->course->id));
-        $surveys = external_api::clean_returnvalue(mod_survey_external::get_surveys_by_courses_returns(), $surveys);
-        $this->assertFalse(isset($surveys['surveys'][0]['intro']));
+        $coursesats = mod_coursesat_external::get_coursesats_by_courses(array($this->course->id));
+        $coursesats = external_api::clean_returnvalue(mod_coursesat_external::get_coursesats_by_courses_returns(), $coursesats);
+        $this->assertFalse(isset($coursesats['coursesats'][0]['intro']));
     }
 
     /**
-     * Test view_survey
+     * Test view_coursesat
      */
-    public function test_view_survey(): void {
+    public function test_view_coursesat(): void {
         global $DB;
 
         // Test invalid instance id.
         try {
-            mod_survey_external::view_survey(0);
-            $this->fail('Exception expected due to invalid mod_survey instance id.');
+            mod_coursesat_external::view_coursesat(0);
+            $this->fail('Exception expected due to invalid mod_coursesat instance id.');
         } catch (\moodle_exception $e) {
             $this->assertEquals('invalidrecord', $e->errorcode);
         }
@@ -238,7 +238,7 @@ final class externallib_test extends externallib_advanced_testcase {
         $usernotenrolled = self::getDataGenerator()->create_user();
         $this->setUser($usernotenrolled);
         try {
-            mod_survey_external::view_survey($this->survey->id);
+            mod_coursesat_external::view_coursesat($this->coursesat->id);
             $this->fail('Exception expected due to not enrolled user.');
         } catch (\moodle_exception $e) {
             $this->assertEquals('requireloginerror', $e->errorcode);
@@ -250,8 +250,8 @@ final class externallib_test extends externallib_advanced_testcase {
         // Trigger and capture the event.
         $sink = $this->redirectEvents();
 
-        $result = mod_survey_external::view_survey($this->survey->id);
-        $result = external_api::clean_returnvalue(mod_survey_external::view_survey_returns(), $result);
+        $result = mod_coursesat_external::view_coursesat($this->coursesat->id);
+        $result = external_api::clean_returnvalue(mod_coursesat_external::view_coursesat_returns(), $result);
         $this->assertTrue($result['status']);
 
         $events = $sink->get_events();
@@ -259,20 +259,20 @@ final class externallib_test extends externallib_advanced_testcase {
         $event = array_shift($events);
 
         // Checking that the event contains the expected values.
-        $this->assertInstanceOf('\mod_survey\event\course_module_viewed', $event);
+        $this->assertInstanceOf('\mod_coursesat\event\course_module_viewed', $event);
         $this->assertEquals($this->context, $event->get_context());
-        $moodlesurvey = new \moodle_url('/mod/survey/view.php', array('id' => $this->cm->id));
-        $this->assertEquals($moodlesurvey, $event->get_url());
+        $moodlecoursesat = new \moodle_url('/mod/coursesat/view.php', array('id' => $this->cm->id));
+        $this->assertEquals($moodlecoursesat, $event->get_url());
         $this->assertEventContextNotUsed($event);
         $this->assertNotEmpty($event->get_name());
 
         // Test user with no capabilities.
         // We need a explicit prohibit since this capability is only defined in authenticated user and guest roles.
-        assign_capability('mod/survey:participate', CAP_PROHIBIT, $this->studentrole->id, $this->context->id);
+        assign_capability('mod/coursesat:participate', CAP_PROHIBIT, $this->studentrole->id, $this->context->id);
         accesslib_clear_all_caches_for_unit_testing();
 
         try {
-            mod_survey_external::view_survey($this->survey->id);
+            mod_coursesat_external::view_coursesat($this->coursesat->id);
             $this->fail('Exception expected due to missing capability.');
         } catch (\moodle_exception $e) {
             $this->assertEquals('nopermissions', $e->errorcode);
@@ -291,12 +291,12 @@ final class externallib_test extends externallib_advanced_testcase {
 
         // Build our expectation array.
         $expectedquestions = array();
-        $questions = survey_get_questions($this->survey);
+        $questions = coursesat_get_questions($this->coursesat);
         foreach ($questions as $q) {
             if ($q->type >= 0) {
                 $expectedquestions[$q->id] = $q;
                 if ($q->multi) {
-                    $subquestions = survey_get_subquestions($q);
+                    $subquestions = coursesat_get_subquestions($q);
                     foreach ($subquestions as $sq) {
                         $expectedquestions[$sq->id] = $sq;
                     }
@@ -304,30 +304,30 @@ final class externallib_test extends externallib_advanced_testcase {
             }
         }
 
-        $result = mod_survey_external::get_questions($this->survey->id);
-        $result = external_api::clean_returnvalue(mod_survey_external::get_questions_returns(), $result);
+        $result = mod_coursesat_external::get_questions($this->coursesat->id);
+        $result = external_api::clean_returnvalue(mod_coursesat_external::get_questions_returns(), $result);
 
         // Check we receive the same questions.
         $this->assertCount(0, $result['warnings']);
         foreach ($result['questions'] as $q) {
-            $this->assertEquals(get_string($expectedquestions[$q['id']]->text, 'survey'), $q['text']);
-            $this->assertEquals(get_string($expectedquestions[$q['id']]->shorttext, 'survey'), $q['shorttext']);
+            $this->assertEquals(get_string($expectedquestions[$q['id']]->text, 'coursesat'), $q['text']);
+            $this->assertEquals(get_string($expectedquestions[$q['id']]->shorttext, 'coursesat'), $q['shorttext']);
             $this->assertEquals($expectedquestions[$q['id']]->multi, $q['multi']);
             $this->assertEquals($expectedquestions[$q['id']]->type, $q['type']);
             // Parent questions must have parent eq to 0.
             if ($q['multi']) {
                 $this->assertEquals(0, $q['parent']);
-                $this->assertEquals(get_string($expectedquestions[$q['id']]->options, 'survey'), $q['options']);
+                $this->assertEquals(get_string($expectedquestions[$q['id']]->options, 'coursesat'), $q['options']);
             }
         }
 
         // Test user with no capabilities.
         // We need a explicit prohibit since this capability is only defined in authenticated user and guest roles.
-        assign_capability('mod/survey:participate', CAP_PROHIBIT, $this->studentrole->id, $this->context->id);
+        assign_capability('mod/coursesat:participate', CAP_PROHIBIT, $this->studentrole->id, $this->context->id);
         accesslib_clear_all_caches_for_unit_testing();
 
         try {
-            mod_survey_external::get_questions($this->survey->id);
+            mod_coursesat_external::get_questions($this->coursesat->id);
             $this->fail('Exception expected due to missing capability.');
         } catch (\moodle_exception $e) {
             $this->assertEquals('nopermissions', $e->errorcode);
@@ -345,12 +345,12 @@ final class externallib_test extends externallib_advanced_testcase {
 
         // Build our questions and responses array.
         $realquestions = array();
-        $questions = survey_get_questions($this->survey);
+        $questions = coursesat_get_questions($this->coursesat);
         $i = 5;
         foreach ($questions as $q) {
             if ($q->type >= 0) {
                 if ($q->multi) {
-                    $subquestions = survey_get_subquestions($q);
+                    $subquestions = coursesat_get_subquestions($q);
                     foreach ($subquestions as $sq) {
                         $realquestions[] = array(
                             'key' => 'q' . $sq->id,
@@ -368,13 +368,13 @@ final class externallib_test extends externallib_advanced_testcase {
             }
         }
 
-        $result = mod_survey_external::submit_answers($this->survey->id, $realquestions);
-        $result = external_api::clean_returnvalue(mod_survey_external::submit_answers_returns(), $result);
+        $result = mod_coursesat_external::submit_answers($this->coursesat->id, $realquestions);
+        $result = external_api::clean_returnvalue(mod_coursesat_external::submit_answers_returns(), $result);
 
         $this->assertTrue($result['status']);
         $this->assertCount(0, $result['warnings']);
 
-        $dbanswers = $DB->get_records_menu('survey_answers', array('survey' => $this->survey->id), '', 'question, answer1');
+        $dbanswers = $DB->get_records_menu('coursesat_answers', array('coursesat' => $this->coursesat->id), '', 'question, answer1');
         foreach ($realquestions as $q) {
             $id = str_replace('q', '', $q['key']);
             $this->assertEquals($q['value'], $dbanswers[$id]);
@@ -382,7 +382,7 @@ final class externallib_test extends externallib_advanced_testcase {
 
         // Submit again, we expect an error here.
         try {
-            mod_survey_external::submit_answers($this->survey->id, $realquestions);
+            mod_coursesat_external::submit_answers($this->coursesat->id, $realquestions);
             $this->fail('Exception expected due to answers already submitted.');
         } catch (\moodle_exception $e) {
             $this->assertEquals('alreadysubmitted', $e->errorcode);
@@ -390,11 +390,11 @@ final class externallib_test extends externallib_advanced_testcase {
 
         // Test user with no capabilities.
         // We need a explicit prohibit since this capability is only defined in authenticated user and guest roles.
-        assign_capability('mod/survey:participate', CAP_PROHIBIT, $this->studentrole->id, $this->context->id);
+        assign_capability('mod/coursesat:participate', CAP_PROHIBIT, $this->studentrole->id, $this->context->id);
         accesslib_clear_all_caches_for_unit_testing();
 
         try {
-            mod_survey_external::submit_answers($this->survey->id, $realquestions);
+            mod_coursesat_external::submit_answers($this->coursesat->id, $realquestions);
             $this->fail('Exception expected due to missing capability.');
         } catch (\moodle_exception $e) {
             $this->assertEquals('nopermissions', $e->errorcode);
@@ -404,7 +404,7 @@ final class externallib_test extends externallib_advanced_testcase {
         $usernotenrolled = self::getDataGenerator()->create_user();
         $this->setUser($usernotenrolled);
         try {
-            mod_survey_external::submit_answers($this->survey->id, $realquestions);
+            mod_coursesat_external::submit_answers($this->coursesat->id, $realquestions);
             $this->fail('Exception expected due to not enrolled user.');
         } catch (\moodle_exception $e) {
             $this->assertEquals('requireloginerror', $e->errorcode);

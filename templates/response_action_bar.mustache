@@ -12,12 +12,12 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_survey/response_action_bar
+    @template mod_coursesat/response_action_bar
     Actions bar for the reports page UI.
     Classes required for JS:
     * none
     Context variables required for this template:
-    * see mod/survey/classes/output/actionbar.php
+    * see mod/coursesat/classes/output/actionbar.php
     Example context (json):
     {
         "download": {
@@ -28,27 +28,27 @@
                 "sesskey": "sesskey",
                 "action": "http://localhost/moodle/course/jumpto.php",
                 "disabled": false,
-                "formid": "surveyresponseselect",
+                "formid": "coursesatresponseselect",
                 "classes": "urlselect",
                 "options": [
                     {
                         "name": "Summary",
-                        "value": "/mod/survey/report.php?id=12&action=summary",
+                        "value": "/mod/coursesat/report.php?id=12&action=summary",
                         "selected": true
                     },
                     {
                         "name": "Scales",
-                        "value": "/mod/survey/report.php?id=12&action=scales",
+                        "value": "/mod/coursesat/report.php?id=12&action=scales",
                         "selected": false
                     },
                     {
                         "name": "Questions",
-                        "value": "/mod/survey/report.php?id=12&action=questions",
+                        "value": "/mod/coursesat/report.php?id=12&action=questions",
                         "selected": false
                     },
                     {
                         "name": "Participants",
-                        "value": "/mod/survey/report.php?id=12&action=students",
+                        "value": "/mod/coursesat/report.php?id=12&action=students",
                         "selected": false
                     }
                 ]

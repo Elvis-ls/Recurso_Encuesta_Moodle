@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file keeps track of upgrades to the survey module
+ * This file keeps track of upgrades to the coursesat module
  *
  * Sometimes, changes between versions involve
  * alterations to database structures and other
@@ -34,12 +34,12 @@
  * Please do not forget to use upgrade_set_timeout()
  * before any action that may take longer time to finish.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2006 Eloy Lafuente (stronk7)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function xmldb_survey_upgrade($oldversion) {
+function xmldb_coursesat_upgrade($oldversion) {
     // Automatically generated Moodle v4.1.0 release upgrade line.
     // Put any upgrade step following this.
 

@@ -17,23 +17,23 @@
 /**
  * Output the actionbar for this activity.
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright 2021 Sujith Haridasan <sujith@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Renderer for the mod_survey tertiary nav
+ * Renderer for the mod_coursesat tertiary nav
  */
-class mod_survey_renderer extends plugin_renderer_base {
+class mod_coursesat_renderer extends plugin_renderer_base {
 
     /**
-     * Renders the action bar for the mod_survey report page.
+     * Renders the action bar for the mod_coursesat report page.
      *
-     * @param \mod_survey\output\actionbar $actionbar Data for the template
+     * @param \mod_coursesat\output\actionbar $actionbar Data for the template
      * @return bool|string rendered HTML string from the template.
      */
-    public function response_actionbar(\mod_survey\output\actionbar $actionbar) {
-        return $this->render_from_template('mod_survey/response_action_bar', $actionbar->export_for_template($this));
+    public function response_actionbar(\mod_coursesat\output\actionbar $actionbar) {
+        return $this->render_from_template('mod_coursesat/response_action_bar', $actionbar->export_for_template($this));
     }
 }

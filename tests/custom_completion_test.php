@@ -17,19 +17,19 @@
 /**
  * Contains unit tests for core_completion/activity_custom_completion.
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright Simey Lameze <simey@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 declare(strict_types=1);
 
-namespace mod_survey;
+namespace mod_coursesat;
 
 use advanced_testcase;
 use cm_info;
 use coding_exception;
-use mod_survey\completion\custom_completion;
+use mod_coursesat\completion\custom_completion;
 use moodle_exception;
 
 defined('MOODLE_INTERNAL') || die();
@@ -38,9 +38,9 @@ global $CFG;
 require_once($CFG->libdir . '/completionlib.php');
 
 /**
- * Class for unit testing mod_survey/activity_custom_completion.
+ * Class for unit testing mod_coursesat/activity_custom_completion.
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright Simey Lameze <simey@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

@@ -25,7 +25,7 @@
 /**
  * @deprecated since Moodle 3.11
  */
-function survey_get_completion_state() {
+function coursesat_get_completion_state() {
     $completionclass = \mod_coursesat\completion\custom_completion::class;
     throw new coding_exception(__FUNCTION__ . "() has been removed, please use the '{$completionclass}' class instead");
 }

@@ -15,24 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit test for mod_survey searching.
+ * Unit test for mod_coursesat searching.
  *
  * This is needed because the activity.php class overrides default behaviour.
  *
- * @package mod_survey
+ * @package mod_coursesat
  * @category test
  * @copyright 2017 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_survey\search;
+namespace mod_coursesat\search;
 
 /**
- * Unit test for mod_survey searching.
+ * Unit test for mod_coursesat searching.
  *
  * This is needed because the activity.php class overrides default behaviour.
  *
- * @package mod_survey
+ * @package mod_coursesat
  * @category test
  * @copyright 2017 The Open University
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -44,38 +44,38 @@ final class search_test extends \advanced_testcase {
      */
     public function setUp(): void {
         parent::setUp();
-        // Survey module is disabled by default, enable it for testing.
+        // coursesat module is disabled by default, enable it for testing.
         $manager = \core_plugin_manager::resolve_plugininfo_class('mod');
-        $manager::enable_plugin('survey', 1);
+        $manager::enable_plugin('coursesat', 1);
     }
 
     /**
-     * Test survey_view
+     * Test coursesat_view
      * @return void
      */
-    public function test_survey_indexing(): void {
+    public function test_coursesat_indexing(): void {
         global $CFG;
 
         $this->resetAfterTest();
 
         require_once($CFG->dirroot . '/search/tests/fixtures/testable_core_search.php');
         \testable_core_search::instance();
-        $area = \core_search\manager::get_search_area('mod_survey-activity');
+        $area = \core_search\manager::get_search_area('mod_coursesat-activity');
 
         // Setup test data.
         $generator = $this->getDataGenerator();
         $course = $generator->create_course();
-        $survey1 = $generator->create_module('survey', ['course' => $course->id]);
-        $survey2 = $generator->create_module('survey', ['course' => $course->id]);
+        $coursesat1 = $generator->create_module('coursesat', ['course' => $course->id]);
+        $coursesat2 = $generator->create_module('coursesat', ['course' => $course->id]);
 
-        // Get all surveys for indexing - note that there are special entries in the table with
+        // Get all coursesats for indexing - note that there are special entries in the table with
         // course zero which should not be returned.
         $rs = $area->get_document_recordset();
         $this->assertEquals(2, iterator_count($rs));
         $rs->close();
 
         // Test specific context and course context.
-        $rs = $area->get_document_recordset(0, \context_module::instance($survey1->cmid));
+        $rs = $area->get_document_recordset(0, \context_module::instance($coursesat1->cmid));
         $this->assertEquals(1, iterator_count($rs));
         $rs->close();
         $rs = $area->get_document_recordset(0, \context_course::instance($course->id));

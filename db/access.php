@@ -17,7 +17,7 @@
 /**
  * Plugin capabilities
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2006 Martin Dougiamas
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    'mod/survey:addinstance' => array(
+    'mod/coursesat:addinstance' => array(
         'riskbitmask' => RISK_XSS,
 
         'captype' => 'write',
@@ -38,7 +38,7 @@ $capabilities = array(
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ),
 
-    'mod/survey:participate' => array(
+    'mod/coursesat:participate' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -50,7 +50,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/survey:readresponses' => array(
+    'mod/coursesat:readresponses' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -61,7 +61,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/survey:download' => array(
+    'mod/coursesat:download' => array(
 
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,

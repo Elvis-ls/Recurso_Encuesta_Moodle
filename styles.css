@@ -1,41 +1,41 @@
-.path-mod-survey .smalltext {
+.path-mod-coursesat .smalltext {
     font-size: 0.75em;
 }
 
-.path-mod-survey .surveytable .rblock label {
+.path-mod-coursesat .coursesattable .rblock label {
     display: block;
 }
 
-.path-mod-survey .surveytable .foundthat,
-.path-mod-survey .surveytable .preferthat {
+.path-mod-coursesat .coursesattable .foundthat,
+.path-mod-coursesat .coursesattable .preferthat {
     white-space: nowrap;
 }
 
-.path-mod-survey .surveytable .buttoncell {
+.path-mod-coursesat .coursesattable .buttoncell {
     width: 5%;
 }
 
-.path-mod-survey .surveytable .optioncell,
-.path-mod-survey .surveytable .questioncell {
+.path-mod-coursesat .coursesattable .optioncell,
+.path-mod-coursesat .coursesattable .questioncell {
     width: 50%;
     vertical-align: top;
 }
 
-.path-mod-survey .surveytable .whitecell {
+.path-mod-coursesat .coursesattable .whitecell {
     background-color: white;
 }
 
-.path-mod-survey #surveyform th {
+.path-mod-coursesat #coursesatform th {
     font-weight: normal;
     text-align: left;
 }
 
-.path-mod-survey #surveyform th.hresponse {
+.path-mod-coursesat #coursesatform th.hresponse {
     text-align: center;
     width: 9%;
 }
 
-#page-mod-survey-report .fullnamecell {
+#page-mod-coursesat-report .fullnamecell {
     width: 10%;
     vertical-align: top;
     white-space: nowrap;

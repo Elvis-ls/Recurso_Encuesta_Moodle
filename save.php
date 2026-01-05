@@ -16,10 +16,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is responsible for saving the results of a users survey and displaying
+ * This file is responsible for saving the results of a users coursesat and displaying
  * the final message.
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -36,7 +36,7 @@
 
     $id = required_param('id', PARAM_INT);    // Course Module ID
 
-    if (! $cm = get_coursemodule_from_id('survey', $id)) {
+    if (! $cm = get_coursemodule_from_id('coursesat', $id)) {
         throw new \moodle_exception('invalidcoursemodule');
     }
 
@@ -44,33 +44,33 @@
         throw new \moodle_exception('coursemisconf');
     }
 
-    $PAGE->set_url('/mod/survey/save.php', array('id'=>$id));
+    $PAGE->set_url('/mod/coursesat/save.php', array('id'=>$id));
     require_login($course, false, $cm);
 
     $context = context_module::instance($cm->id);
-    require_capability('mod/survey:participate', $context);
+    require_capability('mod/coursesat:participate', $context);
 
-    if (! $survey = $DB->get_record("survey", array("id"=>$cm->instance))) {
-        throw new \moodle_exception('invalidsurveyid', 'survey');
+    if (! $coursesat = $DB->get_record("coursesat", array("id"=>$cm->instance))) {
+        throw new \moodle_exception('invalidcoursesatid', 'coursesat');
     }
 
-    $strsurveysaved = get_string('surveysaved', 'survey');
+    $strcoursesatsaved = get_string('coursesatsaved', 'coursesat');
 
-    $PAGE->set_title($strsurveysaved);
+    $PAGE->set_title($strcoursesatsaved);
     $PAGE->set_heading($course->fullname);
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(format_string($survey->name));
+    echo $OUTPUT->heading(format_string($coursesat->name));
 
-    if (survey_already_done($survey->id, $USER->id)) {
-        notice(get_string("alreadysubmitted", "survey"), get_local_referer(false));
+    if (coursesat_already_done($coursesat->id, $USER->id)) {
+        notice(get_string("alreadysubmitted", "coursesat"), get_local_referer(false));
         exit;
     }
 
-    survey_save_answers($survey, $formdata, $course, $context);
+    coursesat_save_answers($coursesat, $formdata, $course, $context);
 
 // Print the page and finish up.
 
-    notice(get_string("thanksforanswers","survey", $USER->firstname), "$CFG->wwwroot/course/view.php?id=$course->id");
+    notice(get_string("thanksforanswers","coursesat", $USER->firstname), "$CFG->wwwroot/course/view.php?id=$course->id");
 
     exit;
 

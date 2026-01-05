@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file is responsible for displaying the survey
+ * This file is responsible for displaying the coursesat
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,7 +27,7 @@ require_once("lib.php");
 
 $id = required_param('id', PARAM_INT);    // Course Module ID.
 
-if (! $cm = get_coursemodule_from_id('survey', $id)) {
+if (! $cm = get_coursemodule_from_id('coursesat', $id)) {
     throw new \moodle_exception('invalidcoursemodule');
 }
 
@@ -37,50 +37,50 @@ if (! $course = $DB->get_record("course", array("id" => $cm->course))) {
     throw new \moodle_exception('coursemisconf');
 }
 
-$PAGE->set_url('/mod/survey/view.php', array('id' => $id));
+$PAGE->set_url('/mod/coursesat/view.php', array('id' => $id));
 require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 
-require_capability('mod/survey:participate', $context);
+require_capability('mod/coursesat:participate', $context);
 
-if (! $survey = $DB->get_record("survey", array("id" => $cm->instance))) {
-    throw new \moodle_exception('invalidsurveyid', 'survey');
+if (! $coursesat = $DB->get_record("coursesat", array("id" => $cm->instance))) {
+    throw new \moodle_exception('invalidcoursesatid', 'coursesat');
 }
 
-if (! $template = $DB->get_record("survey", array("id" => $survey->template))) {
-    throw new \moodle_exception('invalidtmptid', 'survey');
+if (! $template = $DB->get_record("coursesat", array("id" => $coursesat->template))) {
+    throw new \moodle_exception('invalidtmptid', 'coursesat');
 }
 
 $showscales = ($template->name != 'ciqname');
 
-// Check the survey hasn't already been filled out.
-$surveyalreadydone = survey_already_done($survey->id, $USER->id);
-if ($surveyalreadydone) {
+// Check the coursesat hasn't already been filled out.
+$coursesatalreadydone = coursesat_already_done($coursesat->id, $USER->id);
+if ($coursesatalreadydone) {
     // Trigger course_module_viewed event and completion.
-    survey_view($survey, $course, $cm, $context, 'graph');
+    coursesat_view($coursesat, $course, $cm, $context, 'graph');
 } else {
-    survey_view($survey, $course, $cm, $context, 'form');
+    coursesat_view($coursesat, $course, $cm, $context, 'form');
 }
 
-$strsurvey = get_string("modulename", "survey");
-$PAGE->set_title($survey->name);
+$strcoursesat = get_string("modulename", "coursesat");
+$PAGE->set_title($coursesat->name);
 $PAGE->set_heading($course->fullname);
-// No need to show the description if the survey is done and a graph page is to be shown.
-if ($surveyalreadydone && $showscales) {
+// No need to show the description if the coursesat is done and a graph page is to be shown.
+if ($coursesatalreadydone && $showscales) {
     $PAGE->activityheader->set_description('');
 } else {
-    // If the survey has empty description, display the default one.
-    $trimmedintro = trim($survey->intro);
+    // If the coursesat has empty description, display the default one.
+    $trimmedintro = trim($coursesat->intro);
     if (empty($trimmedintro)) {
-        $tempo = $DB->get_field("survey", "intro", array("id" => $survey->template));
-        $PAGE->activityheader->set_description(get_string($tempo, "survey"));
+        $tempo = $DB->get_field("coursesat", "intro", array("id" => $coursesat->template));
+        $PAGE->activityheader->set_description(get_string($tempo, "coursesat"));
     }
 }
 $PAGE->add_body_class('limitedwidth');
 
 echo $OUTPUT->header();
 
-// Check to see if groups are being used in this survey.
+// Check to see if groups are being used in this coursesat.
 if ($groupmode = groups_get_activity_groupmode($cm)) {   // Groups are being used.
     $currentgroup = groups_get_activity_group($cm);
 } else {
@@ -88,7 +88,7 @@ if ($groupmode = groups_get_activity_groupmode($cm)) {   // Groups are being use
 }
 $groupingid = $cm->groupingid;
 
-if (has_capability('mod/survey:readresponses', $context) or ($groupmode == VISIBLEGROUPS)) {
+if (has_capability('mod/coursesat:readresponses', $context) or ($groupmode == VISIBLEGROUPS)) {
     $currentgroup = 0;
 }
 
@@ -97,37 +97,37 @@ if (!$cm->visible) {
 }
 
 if (!is_enrolled($context)) {
-    echo $OUTPUT->notification(get_string("guestsnotallowed", "survey"));
+    echo $OUTPUT->notification(get_string("guestsnotallowed", "coursesat"));
 }
 
-if ($surveyalreadydone) {
-    $numusers = survey_count_responses($survey->id, $currentgroup, $groupingid);
+if ($coursesatalreadydone) {
+    $numusers = coursesat_count_responses($coursesat->id, $currentgroup, $groupingid);
     if ($showscales) {
         // Ensure that graph.php will allow the user to see the graph.
-        if (has_capability('mod/survey:readresponses', $context) || !$groupmode || groups_is_member($currentgroup)) {
+        if (has_capability('mod/coursesat:readresponses', $context) || !$groupmode || groups_is_member($currentgroup)) {
 
-            echo $OUTPUT->box(get_string("surveycompleted", "survey"));
-            echo $OUTPUT->box(get_string("peoplecompleted", "survey", $numusers));
+            echo $OUTPUT->box(get_string("coursesatcompleted", "coursesat"));
+            echo $OUTPUT->box(get_string("peoplecompleted", "coursesat", $numusers));
 
             echo '<div class="resultgraph">';
-            survey_print_graph("id=$cm->id&amp;sid=$USER->id&amp;group=$currentgroup&amp;type=student.png");
+            coursesat_print_graph("id=$cm->id&amp;sid=$USER->id&amp;group=$currentgroup&amp;type=student.png");
             echo '</div>';
         } else {
-            echo $OUTPUT->box(get_string("surveycompletednograph", "survey"));
-            echo $OUTPUT->box(get_string("peoplecompleted", "survey", $numusers));
+            echo $OUTPUT->box(get_string("coursesatcompletednograph", "coursesat"));
+            echo $OUTPUT->box(get_string("peoplecompleted", "coursesat", $numusers));
         }
 
     } else {
 
         echo $OUTPUT->spacer(array('height' => 30, 'width' => 1), true);  // Should be done with CSS instead.
 
-        $questions = survey_get_questions($survey);
+        $questions = coursesat_get_questions($coursesat);
         foreach ($questions as $question) {
 
             if ($question->type == 0 or $question->type == 1) {
-                if ($answer = survey_get_user_answer($survey->id, $question->id, $USER->id)) {
+                if ($answer = coursesat_get_user_answer($coursesat->id, $question->id, $USER->id)) {
                     $table = new html_table();
-                    $table->head = array(get_string($question->text, "survey"));
+                    $table->head = array(get_string($question->text, "coursesat"));
                     $table->align = array ("left");
                     $table->data[] = array(s($answer->answer1));// No html here, just plain text.
                     echo html_writer::table($table);
@@ -141,28 +141,28 @@ if ($surveyalreadydone) {
     exit;
 }
 
-echo "<form method=\"post\" action=\"save.php\" id=\"surveyform\">";
+echo "<form method=\"post\" action=\"save.php\" id=\"coursesatform\">";
 echo '<div>';
 echo "<input type=\"hidden\" name=\"id\" value=\"$id\" />";
 echo "<input type=\"hidden\" name=\"sesskey\" value=\"".sesskey()."\" />";
 
-echo '<div>'. get_string('allquestionrequireanswer', 'survey'). '</div>';
+echo '<div>'. get_string('allquestionrequireanswer', 'coursesat'). '</div>';
 
 // Get all the major questions in order.
-$questions = survey_get_questions($survey);
+$questions = coursesat_get_questions($coursesat);
 
-global $qnum;  // TODO: ugly globals hack for survey_print_*().
+global $qnum;  // TODO: ugly globals hack for coursesat_print_*().
 $qnum = 0;
 foreach ($questions as $question) {
 
     if ($question->type >= 0) {
 
-        $question = survey_translate_question($question);
+        $question = coursesat_translate_question($question);
 
         if ($question->multi) {
-            survey_print_multi($question);
+            coursesat_print_multi($question);
         } else {
-            survey_print_single($question);
+            coursesat_print_single($question);
         }
     }
 }
@@ -174,7 +174,7 @@ if (!is_enrolled($context)) {
     exit;
 }
 
-$PAGE->requires->js_call_amd('mod_survey/validation', 'ensureRadiosChosen', array('surveyform'));
+$PAGE->requires->js_call_amd('mod_coursesat/validation', 'ensureRadiosChosen', array('coursesatform'));
 
 echo '<br />';
 echo '<input type="submit" class="btn btn-primary" value="'. get_string("submit"). '" />';

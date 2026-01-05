@@ -18,7 +18,7 @@
 /**
  * Provides support for the conversion of moodle1 backup to the moodle2 format
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2011 Rossiani Wijaya <rwijaya@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,9 +26,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Survey conversion handler
+ * coursesat conversion handler
  */
-class moodle1_mod_survey_handler extends moodle1_mod_handler {
+class moodle1_mod_coursesat_handler extends moodle1_mod_handler {
 
     /** @var moodle1_file_manager */
     protected $fileman = null;
@@ -43,7 +43,7 @@ class moodle1_mod_survey_handler extends moodle1_mod_handler {
      * For each path returned, the corresponding conversion method must be
      * defined.
      *
-     * Note that the path /MOODLE_BACKUP/COURSE/MODULES/MOD/SURVEY does not
+     * Note that the path /MOODLE_BACKUP/COURSE/MODULES/MOD/coursesat does not
      * actually exist in the file. The last element with the module name was
      * appended by the moodle1_converter class.
      *
@@ -52,7 +52,7 @@ class moodle1_mod_survey_handler extends moodle1_mod_handler {
     public function get_paths() {
         return array(
             new convert_path(
-                'survey', '/MOODLE_BACKUP/COURSE/MODULES/MOD/SURVEY',
+                'coursesat', '/MOODLE_BACKUP/COURSE/MODULES/MOD/coursesat',
                 array(
                     'newfields' => array(
                         'introformat' => 0,
@@ -63,10 +63,10 @@ class moodle1_mod_survey_handler extends moodle1_mod_handler {
     }
 
     /**
-     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/SURVEY
+     * This is executed every time we have one /MOODLE_BACKUP/COURSE/MODULES/MOD/coursesat
      * data available
      */
-    public function process_survey($data) {
+    public function process_coursesat($data) {
         global $CFG;
 
         // get the course module id and context id
@@ -82,18 +82,18 @@ class moodle1_mod_survey_handler extends moodle1_mod_handler {
         }
 
         // get a fresh new file manager for this instance
-        $this->fileman = $this->converter->get_file_manager($contextid, 'mod_survey');
+        $this->fileman = $this->converter->get_file_manager($contextid, 'mod_coursesat');
 
         // convert course files embedded into the intro
         $this->fileman->filearea = 'intro';
         $this->fileman->itemid   = 0;
         $data['intro'] = moodle1_converter::migrate_referenced_files($data['intro'], $this->fileman);
 
-        // write survey.xml
-        $this->open_xml_writer("activities/survey_{$this->moduleid}/survey.xml");
+        // write coursesat.xml
+        $this->open_xml_writer("activities/coursesat_{$this->moduleid}/coursesat.xml");
         $this->xmlwriter->begin_tag('activity', array('id' => $instanceid, 'moduleid' => $this->moduleid,
-            'modulename' => 'survey', 'contextid' => $contextid));
-        $this->xmlwriter->begin_tag('survey', array('id' => $instanceid));
+            'modulename' => 'coursesat', 'contextid' => $contextid));
+        $this->xmlwriter->begin_tag('coursesat', array('id' => $instanceid));
 
         foreach ($data as $field => $value) {
             if ($field <> 'id') {
@@ -105,16 +105,16 @@ class moodle1_mod_survey_handler extends moodle1_mod_handler {
     }
 
     /**
-     * This is executed when we reach the closing </MOD> tag of our 'survey' path
+     * This is executed when we reach the closing </MOD> tag of our 'coursesat' path
      */
-    public function on_survey_end() {
-        // finish survey.xml
-        $this->xmlwriter->end_tag('survey');
+    public function on_coursesat_end() {
+        // finish coursesat.xml
+        $this->xmlwriter->end_tag('coursesat');
         $this->xmlwriter->end_tag('activity');
         $this->close_xml_writer();
 
         // write inforef.xml
-        $this->open_xml_writer("activities/survey_{$this->moduleid}/inforef.xml");
+        $this->open_xml_writer("activities/coursesat_{$this->moduleid}/inforef.xml");
         $this->xmlwriter->begin_tag('inforef');
         $this->xmlwriter->begin_tag('fileref');
         foreach ($this->fileman->get_fileids() as $fileid) {

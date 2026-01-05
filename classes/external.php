@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Survey external API
+ * coursesat external API
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @category   external
  * @copyright  2015 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -35,26 +35,26 @@ use core_external\util;
 
 defined('MOODLE_INTERNAL') || die;
 
-require_once($CFG->dirroot . '/mod/survey/lib.php');
+require_once($CFG->dirroot . '/mod/coursesat/lib.php');
 
 /**
- * Survey external functions
+ * coursesat external functions
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @category   external
  * @copyright  2015 Juan Leyva <juan@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.0
  */
-class mod_survey_external extends external_api {
+class mod_coursesat_external extends external_api {
 
     /**
-     * Describes the parameters for get_surveys_by_courses.
+     * Describes the parameters for get_coursesats_by_courses.
      *
      * @return external_function_parameters
      * @since Moodle 3.0
      */
-    public static function get_surveys_by_courses_parameters() {
+    public static function get_coursesats_by_courses_parameters() {
         return new external_function_parameters (
             array(
                 'courseids' => new external_multiple_structure(
@@ -65,20 +65,20 @@ class mod_survey_external extends external_api {
     }
 
     /**
-     * Returns a list of surveys in a provided list of courses,
-     * if no list is provided all surveys that the user can view will be returned.
+     * Returns a list of coursesats in a provided list of courses,
+     * if no list is provided all coursesats that the user can view will be returned.
      *
      * @param array $courseids the course ids
-     * @return array of surveys details
+     * @return array of coursesats details
      * @since Moodle 3.0
      */
-    public static function get_surveys_by_courses($courseids = array()) {
+    public static function get_coursesats_by_courses($courseids = array()) {
         global $CFG, $USER, $DB;
 
-        $returnedsurveys = array();
+        $returnedcoursesats = array();
         $warnings = array();
 
-        $params = self::validate_parameters(self::get_surveys_by_courses_parameters(), array('courseids' => $courseids));
+        $params = self::validate_parameters(self::get_coursesats_by_courses_parameters(), array('courseids' => $courseids));
 
         $mycourses = array();
         if (empty($params['courseids'])) {
@@ -90,61 +90,61 @@ class mod_survey_external extends external_api {
         if (!empty($params['courseids'])) {
             list($courses, $warnings) = util::validate_courses($params['courseids'], $mycourses);
 
-            // Get the surveys in this course, this function checks users visibility permissions.
+            // Get the coursesats in this course, this function checks users visibility permissions.
             // We can avoid then additional validate_context calls.
-            $surveys = get_all_instances_in_courses("survey", $courses);
-            foreach ($surveys as $survey) {
-                $context = context_module::instance($survey->coursemodule);
-                if (empty(trim($survey->intro))) {
-                    $tempo = $DB->get_field("survey", "intro", array("id" => $survey->template));
-                    $survey->intro = get_string($tempo, "survey");
+            $coursesats = get_all_instances_in_courses("coursesat", $courses);
+            foreach ($coursesats as $coursesat) {
+                $context = context_module::instance($coursesat->coursemodule);
+                if (empty(trim($coursesat->intro))) {
+                    $tempo = $DB->get_field("coursesat", "intro", array("id" => $coursesat->template));
+                    $coursesat->intro = get_string($tempo, "coursesat");
                 }
 
                 // Entry to return.
-                $surveydetails = helper_for_get_mods_by_courses::standard_coursemodule_element_values(
-                        $survey, 'mod_survey', 'moodle/course:manageactivities', 'mod/survey:participate');
+                $coursesatdetails = helper_for_get_mods_by_courses::standard_coursemodule_element_values(
+                        $coursesat, 'mod_coursesat', 'moodle/course:manageactivities', 'mod/coursesat:participate');
 
-                if (has_capability('mod/survey:participate', $context)) {
-                    $surveydetails['template']  = $survey->template;
-                    $surveydetails['days']      = $survey->days;
-                    $surveydetails['questions'] = $survey->questions;
-                    $surveydetails['surveydone'] = survey_already_done($survey->id, $USER->id) ? 1 : 0;
+                if (has_capability('mod/coursesat:participate', $context)) {
+                    $coursesatdetails['template']  = $coursesat->template;
+                    $coursesatdetails['days']      = $coursesat->days;
+                    $coursesatdetails['questions'] = $coursesat->questions;
+                    $coursesatdetails['coursesatdone'] = coursesat_already_done($coursesat->id, $USER->id) ? 1 : 0;
                 }
 
                 if (has_capability('moodle/course:manageactivities', $context)) {
-                    $surveydetails['timecreated']   = $survey->timecreated;
-                    $surveydetails['timemodified']  = $survey->timemodified;
+                    $coursesatdetails['timecreated']   = $coursesat->timecreated;
+                    $coursesatdetails['timemodified']  = $coursesat->timemodified;
                 }
-                $returnedsurveys[] = $surveydetails;
+                $returnedcoursesats[] = $coursesatdetails;
             }
         }
         $result = array();
-        $result['surveys'] = $returnedsurveys;
+        $result['coursesats'] = $returnedcoursesats;
         $result['warnings'] = $warnings;
         return $result;
     }
 
     /**
-     * Describes the get_surveys_by_courses return value.
+     * Describes the get_coursesats_by_courses return value.
      *
      * @return external_single_structure
      * @since Moodle 3.0
      */
-    public static function get_surveys_by_courses_returns() {
+    public static function get_coursesats_by_courses_returns() {
         return new external_single_structure(
             array(
-                'surveys' => new external_multiple_structure(
+                'coursesats' => new external_multiple_structure(
                     new external_single_structure(array_merge(
                        helper_for_get_mods_by_courses::standard_coursemodule_elements_returns(true),
                        [
-                            'template' => new external_value(PARAM_INT, 'Survey type', VALUE_OPTIONAL),
+                            'template' => new external_value(PARAM_INT, 'coursesat type', VALUE_OPTIONAL),
                             'days' => new external_value(PARAM_INT, 'Days', VALUE_OPTIONAL),
                             'questions' => new external_value(PARAM_RAW, 'Question ids', VALUE_OPTIONAL),
-                            'surveydone' => new external_value(PARAM_INT, 'Did I finish the survey?', VALUE_OPTIONAL),
+                            'coursesatdone' => new external_value(PARAM_INT, 'Did I finish the coursesat?', VALUE_OPTIONAL),
                             'timecreated' => new external_value(PARAM_INT, 'Time of creation', VALUE_OPTIONAL),
                             'timemodified' => new external_value(PARAM_INT, 'Time of last modification', VALUE_OPTIONAL),
                         ]
-                    ), 'Surveys')
+                    ), 'coursesats')
                 ),
                 'warnings' => new external_warnings(),
             )
@@ -157,10 +157,10 @@ class mod_survey_external extends external_api {
      * @return external_function_parameters
      * @since Moodle 3.0
      */
-    public static function view_survey_parameters() {
+    public static function view_coursesat_parameters() {
         return new external_function_parameters(
             array(
-                'surveyid' => new external_value(PARAM_INT, 'survey instance id')
+                'coursesatid' => new external_value(PARAM_INT, 'coursesat instance id')
             )
         );
     }
@@ -168,32 +168,32 @@ class mod_survey_external extends external_api {
     /**
      * Trigger the course module viewed event and update the module completion status.
      *
-     * @param int $surveyid the survey instance id
+     * @param int $coursesatid the coursesat instance id
      * @return array of warnings and status result
      * @since Moodle 3.0
      * @throws moodle_exception
      */
-    public static function view_survey($surveyid) {
+    public static function view_coursesat($coursesatid) {
         global $DB, $USER;
 
-        $params = self::validate_parameters(self::view_survey_parameters(),
+        $params = self::validate_parameters(self::view_coursesat_parameters(),
                                             array(
-                                                'surveyid' => $surveyid
+                                                'coursesatid' => $coursesatid
                                             ));
         $warnings = array();
 
         // Request and permission validation.
-        $survey = $DB->get_record('survey', array('id' => $params['surveyid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($survey, 'survey');
+        $coursesat = $DB->get_record('coursesat', array('id' => $params['coursesatid']), '*', MUST_EXIST);
+        list($course, $cm) = get_course_and_cm_from_instance($coursesat, 'coursesat');
 
         $context = context_module::instance($cm->id);
         self::validate_context($context);
-        require_capability('mod/survey:participate', $context);
+        require_capability('mod/coursesat:participate', $context);
 
-        $viewed = survey_already_done($survey->id, $USER->id) ? 'graph' : 'form';
+        $viewed = coursesat_already_done($coursesat->id, $USER->id) ? 'graph' : 'form';
 
         // Trigger course_module_viewed event and completion.
-        survey_view($survey, $course, $cm, $context, $viewed);
+        coursesat_view($coursesat, $course, $cm, $context, $viewed);
 
         $result = array();
         $result['status'] = true;
@@ -207,7 +207,7 @@ class mod_survey_external extends external_api {
      * @return \core_external\external_description
      * @since Moodle 3.0
      */
-    public static function view_survey_returns() {
+    public static function view_coursesat_returns() {
         return new external_single_structure(
             array(
                 'status' => new external_value(PARAM_BOOL, 'status: true if success'),
@@ -225,50 +225,50 @@ class mod_survey_external extends external_api {
     public static function get_questions_parameters() {
         return new external_function_parameters(
             array(
-                'surveyid' => new external_value(PARAM_INT, 'survey instance id')
+                'coursesatid' => new external_value(PARAM_INT, 'coursesat instance id')
             )
         );
     }
 
     /**
-     * Get the complete list of questions for the survey, including subquestions.
+     * Get the complete list of questions for the coursesat, including subquestions.
      *
-     * @param int $surveyid the survey instance id
+     * @param int $coursesatid the coursesat instance id
      * @return array of warnings and the question list
      * @since Moodle 3.0
      * @throws moodle_exception
      */
-    public static function get_questions($surveyid) {
+    public static function get_questions($coursesatid) {
         global $DB, $USER;
 
         $params = self::validate_parameters(self::get_questions_parameters(),
                                             array(
-                                                'surveyid' => $surveyid
+                                                'coursesatid' => $coursesatid
                                             ));
         $warnings = array();
 
         // Request and permission validation.
-        $survey = $DB->get_record('survey', array('id' => $params['surveyid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($survey, 'survey');
+        $coursesat = $DB->get_record('coursesat', array('id' => $params['coursesatid']), '*', MUST_EXIST);
+        list($course, $cm) = get_course_and_cm_from_instance($coursesat, 'coursesat');
 
         $context = context_module::instance($cm->id);
         self::validate_context($context);
-        require_capability('mod/survey:participate', $context);
+        require_capability('mod/coursesat:participate', $context);
 
-        $mainquestions = survey_get_questions($survey);
+        $mainquestions = coursesat_get_questions($coursesat);
 
         foreach ($mainquestions as $question) {
             if ($question->type >= 0) {
                 // Parent is used in subquestions.
                 $question->parent = 0;
-                $questions[] = survey_translate_question($question);
+                $questions[] = coursesat_translate_question($question);
 
                 // Check if the question has subquestions.
                 if ($question->multi) {
-                    $subquestions = survey_get_subquestions($question);
+                    $subquestions = coursesat_get_subquestions($question);
                     foreach ($subquestions as $sq) {
                         $sq->parent = $question->id;
-                        $questions[] = survey_translate_question($sq);
+                        $questions[] = coursesat_translate_question($sq);
                     }
                 }
             }
@@ -317,7 +317,7 @@ class mod_survey_external extends external_api {
     public static function submit_answers_parameters() {
         return new external_function_parameters(
             array(
-                'surveyid' => new external_value(PARAM_INT, 'Survey id'),
+                'coursesatid' => new external_value(PARAM_INT, 'coursesat id'),
                 'answers' => new external_multiple_structure(
                     new external_single_structure(
                         array(
@@ -331,44 +331,44 @@ class mod_survey_external extends external_api {
     }
 
     /**
-     * Submit the answers for a given survey.
+     * Submit the answers for a given coursesat.
      *
-     * @param int $surveyid the survey instance id
-     * @param array $answers the survey answers
+     * @param int $coursesatid the coursesat instance id
+     * @param array $answers the coursesat answers
      * @return array of warnings and status result
      * @since Moodle 3.0
      * @throws moodle_exception
      */
-    public static function submit_answers($surveyid, $answers) {
+    public static function submit_answers($coursesatid, $answers) {
         global $DB, $USER;
 
         $params = self::validate_parameters(self::submit_answers_parameters(),
                                             array(
-                                                'surveyid' => $surveyid,
+                                                'coursesatid' => $coursesatid,
                                                 'answers' => $answers
                                             ));
         $warnings = array();
 
         // Request and permission validation.
-        $survey = $DB->get_record('survey', array('id' => $params['surveyid']), '*', MUST_EXIST);
-        list($course, $cm) = get_course_and_cm_from_instance($survey, 'survey');
+        $coursesat = $DB->get_record('coursesat', array('id' => $params['coursesatid']), '*', MUST_EXIST);
+        list($course, $cm) = get_course_and_cm_from_instance($coursesat, 'coursesat');
 
         $context = context_module::instance($cm->id);
         self::validate_context($context);
-        require_capability('mod/survey:participate', $context);
+        require_capability('mod/coursesat:participate', $context);
 
-        if (survey_already_done($survey->id, $USER->id)) {
-            throw new moodle_exception("alreadysubmitted", "survey");
+        if (coursesat_already_done($coursesat->id, $USER->id)) {
+            throw new moodle_exception("alreadysubmitted", "coursesat");
         }
 
-        // Build the answers array. Data is cleaned inside the survey_save_answers function.
+        // Build the answers array. Data is cleaned inside the coursesat_save_answers function.
         $answers = array();
         foreach ($params['answers'] as $answer) {
             $key = $answer['key'];
             $answers[$key] = $answer['value'];
         }
 
-        survey_save_answers($survey, $answers, $course, $context);
+        coursesat_save_answers($coursesat, $answers, $course, $context);
 
         $result = array();
         $result['status'] = true;

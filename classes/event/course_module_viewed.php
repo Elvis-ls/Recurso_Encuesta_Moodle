@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_survey course module viewed event.
+ * The mod_coursesat course module viewed event.
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_survey\event;
+namespace mod_coursesat\event;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  *      - string viewed: what was viewed
  * }
  *
- * @package    mod_survey
+ * @package    mod_coursesat
  * @since      Moodle 2.7
  * @copyright  2014 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -46,7 +46,7 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * Set basic properties for the event.
      */
     protected function init() {
-        $this->data['objecttable'] = 'survey';
+        $this->data['objecttable'] = 'coursesat';
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
     }
@@ -65,7 +65,7 @@ class course_module_viewed extends \core\event\course_module_viewed {
     }
 
     public static function get_objectid_mapping() {
-        return array('db' => 'survey', 'restore' => 'survey');
+        return array('db' => 'coursesat', 'restore' => 'coursesat');
     }
 
     public static function get_other_mapping() {

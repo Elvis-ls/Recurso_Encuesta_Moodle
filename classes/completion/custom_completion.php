@@ -16,17 +16,17 @@
 
 declare(strict_types=1);
 
-namespace mod_survey\completion;
+namespace mod_coursesat\completion;
 
 use core_completion\activity_custom_completion;
 
 /**
- * Activity custom completion subclass for the survey activity.
+ * Activity custom completion subclass for the coursesat activity.
  *
- * Class for defining mod_survey's custom completion rules and fetching the completion statuses
- * of the custom completion rules for a given survey instance and a user.
+ * Class for defining mod_coursesat's custom completion rules and fetching the completion statuses
+ * of the custom completion rules for a given coursesat instance and a user.
  *
- * @package mod_survey
+ * @package mod_coursesat
  * @copyright Simey Lameze <simey@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -43,8 +43,8 @@ class custom_completion extends activity_custom_completion {
 
         $this->validate_rule($rule);
 
-        // Survey only supports completionsubmit as a custom rule.
-        $status = $DB->record_exists('survey_answers', ['survey' => $this->cm->instance, 'userid' => $this->userid]);
+        // coursesat only supports completionsubmit as a custom rule.
+        $status = $DB->record_exists('coursesat_answers', ['coursesat' => $this->cm->instance, 'userid' => $this->userid]);
         return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
     }
 
@@ -64,7 +64,7 @@ class custom_completion extends activity_custom_completion {
      */
     public function get_custom_rule_descriptions(): array {
         return [
-            'completionsubmit' => get_string('completiondetail:submit', 'survey')
+            'completionsubmit' => get_string('completiondetail:submit', 'coursesat')
         ];
     }
 

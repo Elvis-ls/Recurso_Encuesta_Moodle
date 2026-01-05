@@ -17,14 +17,15 @@
 /**
  * Version information
  *
- * @package    mod_survey
- * @copyright  1999 onwards Martin Dougiamas  {@link http://moodle.com}
+ * @package    mod_coursesat
+ * @copyright  2024 Tu Nombre
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2024100700;       // The current module version (Date: YYYYMMDDXX).
-$plugin->requires  = 2024100100;    // Requires this Moodle version.
-$plugin->component = 'mod_coursesat';     // Full name of the plugin (used for diagnostics)
-$plugin->cron      = 0;
+$plugin->version   = 2024010500;       // YYYYMMDDXX
+$plugin->requires  = 2023100900;       // Moodle 4.3
+$plugin->component = 'mod_coursesat';  // Nombre completo del plugin
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = 'v1.0';
