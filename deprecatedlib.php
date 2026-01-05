@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * List of deprecated mod_survey functions.
+ * List of deprecated mod_coursesat functions.
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright 2021 Shamim Rezaie <shamim@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,6 +26,6 @@
  * @deprecated since Moodle 3.11
  */
 function survey_get_completion_state() {
-    $completionclass = \mod_survey\completion\custom_completion::class;
+    $completionclass = \mod_coursesat\completion\custom_completion::class;
     throw new coding_exception(__FUNCTION__ . "() has been removed, please use the '{$completionclass}' class instead");
 }

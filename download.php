@@ -19,7 +19,7 @@
  * This file is responsible for producing the downloadable versions of a survey
  * module.
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright 1999 onwards Martin Dougiamas  {@link http://moodle.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -57,7 +57,7 @@ $params = array(
     'courseid' => $course->id,
     'other' => array('type' => $type, 'groupid' => $group)
 );
-$event = \mod_survey\event\report_downloaded::create($params);
+$event = \mod_coursesat\event\report_downloaded::create($params);
 $event->trigger();
 
 /// Check to see if groups are being used in this survey

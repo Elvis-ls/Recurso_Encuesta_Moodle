@@ -18,7 +18,7 @@
 /**
  * This file is responsible for producing the graph for survey reports
  *
- * @package   mod_survey
+ * @package   mod_coursesat
  * @copyright 2021 Sujith Haridasan <sujith@moodle.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
