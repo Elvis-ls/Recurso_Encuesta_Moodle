@@ -65,7 +65,7 @@ class mod_coursesat_mod_form extends moodleform_mod {
         // DESCRIPCIÓN (OPCIONAL)
         // =============================================
         // El profesor puede agregar instrucciones adicionales
-        $this->standard_intro_elements(get_string('customintro', 'coursesat'));
+        $this->standard_intro_elements();
 
         // =============================================
         // CONFIGURACIÓN ESTÁNDAR DE MOODLE

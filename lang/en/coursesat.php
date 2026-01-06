@@ -112,3 +112,55 @@ $string['privacy:metadata:answers:userid'] = 'El ID del usuario que envió su re
 $string['privacy:metadata:analysis'] = 'Un registro de análisis de respuestas de encuestas.';
 $string['privacy:metadata:analysis:notes'] = 'Notas guardadas contra las respuestas de un usuario.';
 $string['privacy:metadata:analysis:userid'] = 'El ID del usuario que responde la encuesta.';
+
+// ===============================================
+// STRINGS DE REPORTES
+// ===============================================
+$string['summary'] = 'Resumen';
+$string['scales'] = 'Escalas';
+$string['questions'] = 'Preguntas';
+$string['participants'] = 'Participantes';
+$string['responses'] = 'Respuestas';
+$string['downloadresults'] = 'Descargar resultados';
+$string['download'] = 'Descargar';
+$string['downloadinfo'] = 'Puedes descargar los datos completos de esta encuesta en los siguientes formatos:';
+$string['downloadtext'] = 'Descargar en formato de texto';
+$string['downloadexcel'] = 'Descargar en formato Excel';
+$string['downloadods'] = 'Descargar en formato ODS';
+
+// ===============================================
+// STRINGS DE NAVEGACIÓN Y MENÚS
+// ===============================================
+$string['responsereports'] = 'Ver reportes de respuestas';
+
+// ===============================================
+// STRINGS DE MENSAJES AL USUARIO
+// ===============================================
+$string['thanksforanswers'] = 'Gracias por completar la encuesta, {$a}';
+$string['coursesatcompleted'] = 'Has completado esta encuesta.';
+$string['coursesatcompletednograph'] = 'Has completado esta encuesta.';
+$string['peoplecompleted'] = '{$a} personas han completado esta encuesta';
+$string['coursesatsaved'] = 'Tus respuestas han sido guardadas. Gracias.';
+
+// ===============================================
+// STRINGS DEL FORMULARIO (mod_form.php)
+// ===============================================
+$string['coursesattype'] = 'Tipo de encuesta';
+$string['customintro'] = 'Descripción';
+
+// ===============================================
+// OTROS STRINGS NECESARIOS
+// ===============================================
+$string['nobodyyet'] = 'Nadie ha completado esta encuesta todavía';
+$string['done'] = 'Completado';
+$string['notdone'] = 'No completado';
+$string['savednotes'] = 'Tus notas han sido guardadas';
+$string['errorunabletosavenotes'] = 'Error al guardar tus notas';
+$string['deleteallanswers'] = 'Eliminar todas las respuestas de la encuesta';
+$string['deleteanalysis'] = 'Eliminar todos los análisis';
+$string['analysisof'] = 'Análisis de {$a}';
+$string['guestsnotallowed'] = 'Los invitados no pueden enviar encuestas';
+$string['report'] = 'Reporte de encuesta';
+$string['indicator:cognitivedepth'] = 'Encuesta de satisfacción cognitiva';
+$string['indicator:socialbreadth'] = 'Encuesta de satisfacción social';
+$string['page-mod-coursesat-x'] = 'Cualquier página del módulo de encuesta de satisfacción';
