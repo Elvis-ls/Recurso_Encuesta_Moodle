@@ -98,7 +98,7 @@ $PAGE->activityheader->set_attrs([
 ]);
 
 // Activate the secondary nav tab.
-navigation_node::override_active_url(new moodle_url('/mod/coursesat/report.php', ['id' => $id, 'action' => 'summary']));
+navigation_node::override_active_url(new moodle_url('/mod/coursesat/report.php', ['id' => $id, 'action' => 'questions']));
 
 $actionbar = new \mod_coursesat\output\actionbar($id, $action, $url);
 echo $OUTPUT->header();
@@ -503,9 +503,7 @@ switch ($action) {
             $options["id"] = "$cm->id";
             $options["group"] = $currentgroup;
 
-            $options["type"] = "ods";
-            echo $OUTPUT->single_button(new moodle_url("download.php", $options), get_string("downloadods"));
-
+            // Solo Excel y TXT
             $options["type"] = "xls";
             echo $OUTPUT->single_button(new moodle_url("download.php", $options), get_string("downloadexcel"));
 

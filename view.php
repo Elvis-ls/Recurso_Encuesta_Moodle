@@ -101,42 +101,12 @@ if (!is_enrolled($context)) {
 }
 
 if ($coursesatalreadydone) {
-    $numusers = coursesat_count_responses($coursesat->id, $currentgroup, $groupingid);
     if ($showscales) {
-        // Ensure that graph.php will allow the user to see the graph.
-        if (has_capability('mod/coursesat:readresponses', $context) || !$groupmode || groups_is_member($currentgroup)) {
-
-            echo $OUTPUT->box(get_string("coursesatcompleted", "coursesat"));
-            echo $OUTPUT->box(get_string("peoplecompleted", "coursesat", $numusers));
-
-            echo '<div class="resultgraph">';
-            coursesat_print_graph("id=$cm->id&amp;sid=$USER->id&amp;group=$currentgroup&amp;type=student.png");
-            echo '</div>';
-        } else {
-            echo $OUTPUT->box(get_string("coursesatcompletednograph", "coursesat"));
-            echo $OUTPUT->box(get_string("peoplecompleted", "coursesat", $numusers));
-        }
-
+        // Solo mostrar mensaje de completado, sin gráfico ni contador
+        echo $OUTPUT->box(get_string("coursesatcompleted", "coursesat"));
     } else {
-
-        echo $OUTPUT->spacer(array('height' => 30, 'width' => 1), true);  // Should be done with CSS instead.
-
-        $questions = coursesat_get_questions($coursesat);
-        foreach ($questions as $question) {
-
-            if ($question->type == 0 or $question->type == 1) {
-                if ($answer = coursesat_get_user_answer($coursesat->id, $question->id, $USER->id)) {
-                    $table = new html_table();
-                    $table->head = array(get_string($question->text, "coursesat"));
-                    $table->align = array ("left");
-                    $table->data[] = array(s($answer->answer1));// No html here, just plain text.
-                    echo html_writer::table($table);
-                    echo $OUTPUT->spacer(array('height' => 30, 'width' => 1), true);
-                }
-            }
-        }
+        echo $OUTPUT->box(get_string("coursesatcompletednograph", "coursesat"));
     }
-
     echo $OUTPUT->footer();
     exit;
 }

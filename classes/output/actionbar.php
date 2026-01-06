@@ -92,10 +92,6 @@ class actionbar implements renderable, templatable {
         $coursesat = $DB->get_record("coursesat", ["id" => $cm->instance]);
 
         $actions = [];
-        if ($coursesat && ($coursesat->template != coursesat_CIQ)) {
-            $actions['summary'] = get_string('summary', 'coursesat');
-            $actions['scales'] = get_string('scales', 'coursesat');
-        }
         $actions['questions'] = get_string('questions', 'coursesat');
         $actions['students'] = get_string('participants');
 

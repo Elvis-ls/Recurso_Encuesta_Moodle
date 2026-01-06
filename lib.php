@@ -828,11 +828,8 @@ function coursesat_extend_settings_navigation(settings_navigation $settings, nav
 
         $coursesat = $DB->get_record("coursesat", ["id" => $cm->instance]);
         $url = new moodle_url('/mod/coursesat/report.php', ['id' => $cm->id]);
-        if ($coursesat && ($coursesat->template != coursesat_CIQ)) {
-            $url->param('action', 'summary');
-        } else {
-            $url->param('action', 'questions');
-        }
+        // Siempre mostrar la página de preguntas por defecto
+        $url->param('action', 'questions');
         $coursesatnode->add(get_string("responsereports", "coursesat"), $url);
     }
 }

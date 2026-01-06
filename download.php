@@ -196,11 +196,7 @@ if ($type == "ods") {
         if (! $u = $DB->get_record("user", array("id"=>$user))) {
             throw new \moodle_exception('invaliduserid');
         }
-        if ($n = $DB->get_record("coursesat_analysis", array("coursesat"=>$coursesat->id, "userid"=>$user))) {
-            $notes = $n->notes;
-        } else {
-            $notes = "No notes made";
-        }
+
         $myxls->write_string($row,$col++,$coursesat->id);
         $myxls->write_string($row,$col++,strip_tags(format_text($coursesat->name,true)));
         $myxls->write_string($row,$col++,$user);
@@ -208,9 +204,7 @@ if ($type == "ods") {
         $myxls->write_string($row,$col++,$u->lastname);
         $myxls->write_string($row,$col++,$u->email);
         $myxls->write_string($row,$col++,$u->idnumber);
-        $myxls->write_string($row,$col++, userdate($results[$user]["time"], "%d-%b-%Y %I:%M:%S %p") );
-//          $myxls->write_number($row,$col++,$results[$user]["time"],$date);
-        $myxls->write_string($row,$col++,$notes);
+        $myxls->write_string($row,$col++, userdate($results[$user]["time"], "%d-%b-%Y %I:%M:%S %p") );;
 
         foreach ($nestedorder as $key => $nestedquestions) {
             foreach ($nestedquestions as $key2 => $qid) {
@@ -243,7 +237,7 @@ if ($type == "xls") {
 /// Creating the first worksheet
     $myxls = $workbook->add_worksheet(core_text::substr(strip_tags(format_string($coursesat->name,true)), 0, 31));
 
-    $header = array("coursesatid","coursesatname","userid","firstname","lastname","email","idnumber","time", "notes");
+    $header = array("id_encuesta","nombre_encuesta","id_usuario","nombre","apellido","email","numero_identificacion","fecha_hora");
     $col=0;
     foreach ($header as $item) {
         $myxls->write_string(0,$col++,$item);
@@ -318,7 +312,7 @@ header("Content-Disposition: attachment; filename=\"$downloadfilename.txt\"");
 
 // Print names of all the fields
 
-echo "coursesatid    coursesatname    userid    firstname    lastname    email    idnumber    time    ";
+echo "id_encuesta    nombre_encuesta    id_usuario    nombre    apellido    email    numero_identificacion    fecha_hora    ";
 
 foreach ($nestedorder as $key => $nestedquestions) {
     foreach ($nestedquestions as $key2 => $qid) {
