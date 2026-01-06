@@ -266,11 +266,7 @@ if ($type == "xls") {
         if (! $u = $DB->get_record("user", array("id"=>$user))) {
             throw new \moodle_exception('invaliduserid');
         }
-        if ($n = $DB->get_record("coursesat_analysis", array("coursesat"=>$coursesat->id, "userid"=>$user))) {
-            $notes = $n->notes;
-        } else {
-            $notes = "No notes made";
-        }
+        // Ya no usamos notes
         $myxls->write_string($row,$col++,$coursesat->id);
         $myxls->write_string($row,$col++,strip_tags(format_text($coursesat->name,true)));
         $myxls->write_string($row,$col++,$user);
@@ -279,8 +275,6 @@ if ($type == "xls") {
         $myxls->write_string($row,$col++,$u->email);
         $myxls->write_string($row,$col++,$u->idnumber);
         $myxls->write_string($row,$col++, userdate($results[$user]["time"], "%d-%b-%Y %I:%M:%S %p") );
-//          $myxls->write_number($row,$col++,$results[$user]["time"],$date);
-        $myxls->write_string($row,$col++,$notes);
 
         foreach ($nestedorder as $key => $nestedquestions) {
             foreach ($nestedquestions as $key2 => $qid) {
