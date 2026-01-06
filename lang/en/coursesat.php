@@ -164,3 +164,27 @@ $string['report'] = 'Reporte de encuesta';
 $string['indicator:cognitivedepth'] = 'Encuesta de satisfacción cognitiva';
 $string['indicator:socialbreadth'] = 'Encuesta de satisfacción social';
 $string['page-mod-coursesat-x'] = 'Cualquier página del módulo de encuesta de satisfacción';
+
+// ===============================================
+// STRINGS DE GRÁFICAS Y VISUALIZACIONES
+// ===============================================
+$string['coursesatgraph'] = 'Gráfica de resultados de la encuesta';
+$string['newcoursesatresponses'] = 'Nuevas respuestas de encuesta';
+$string['actual'] = 'Actual';
+$string['actualclass'] = 'Clase actual';
+$string['actualstudent'] = '{$a} actual';
+$string['preferred'] = 'Preferido';
+$string['preferredclass'] = 'Clase preferida';
+$string['preferredstudent'] = '{$a} preferido';
+$string['seemoredetail'] = 'Ver más detalle';
+$string['allscales'] = 'Todas las escalas';
+$string['selectedquestions'] = 'Preguntas seleccionadas';
+$string['notes'] = 'Notas de análisis';
+$string['responsereports'] = 'Reportes de respuestas';
+
+// ===============================================
+// STRINGS ADICIONALES PARA REPORTES
+// ===============================================
+$string['cannotviewreport'] = 'No puedes ver este reporte';
+$string['cannotfindanswer'] = 'No se pueden encontrar respuestas para esta encuesta';
+$string['nopermissiontoshow'] = 'No tienes permiso para ver esta información';
