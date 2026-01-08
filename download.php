@@ -256,9 +256,6 @@ if ($type == "xls") {
         }
     }
 
-//      $date = $workbook->addformat();
-//      $date->set_num_format('mmmm-d-yyyy h:mm:ss AM/PM'); // ?? adjust the settings to reflect the PHP format below
-
     $row = 0;
     foreach ($results as $user => $rest) {
         $col = 0;
