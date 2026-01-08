@@ -121,7 +121,7 @@ echo '<div>'. get_string('allquestionrequireanswer', 'coursesat'). '</div>';
 // Get all the major questions in order.
 $questions = coursesat_get_questions($coursesat);
 
-global $qnum;  // TODO: ugly globals hack for coursesat_print_*().
+global $qnum;  
 $qnum = 0;
 foreach ($questions as $question) {
 
