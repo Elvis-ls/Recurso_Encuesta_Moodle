@@ -5,7 +5,6 @@
  * PROPÓSITO: Formulario de configuración que ve el profesor
  * cuando crea/edita la actividad
  * 
- * MODIFICACIÓN: Simplificamos para usar solo la encuesta de satisfacción
  */
 
 if (!defined('MOODLE_INTERNAL')) {
