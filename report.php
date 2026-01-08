@@ -216,7 +216,7 @@ switch ($action) {
 
     case "questions":
 
-        if ($qid) {     // Just get one multi-question.
+        if ($qid) {     
             $questions = $DB->get_records_select("coursesat_questions", "id in ($qid)");
             $questionorder = explode(",", $qid);
 
@@ -245,7 +245,7 @@ switch ($action) {
 
             foreach ($questionorder as $key => $val) {
                 $question = $questions[$val];
-                if ($question->type < 0) {  // We have some virtual scales.  DON'T show them.
+                if ($question->type < 0) {  
                     $virtualscales = true;
                     break;
                 }
@@ -254,7 +254,7 @@ switch ($action) {
             foreach ($questionorder as $key => $val) {
                 $question = $questions[$val];
 
-                if ($question->type < 0) {  // We have some virtual scales.  DON'T show them.
+                if ($question->type < 0) {  
                     continue;
                 }
                 $question->text = get_string($question->text, "coursesat");
