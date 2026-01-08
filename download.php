@@ -263,7 +263,6 @@ if ($type == "xls") {
         if (! $u = $DB->get_record("user", array("id"=>$user))) {
             throw new \moodle_exception('invaliduserid');
         }
-        // Ya no usamos notes
         $myxls->write_string($row,$col++,$coursesat->id);
         $myxls->write_string($row,$col++,strip_tags(format_text($coursesat->name,true)));
         $myxls->write_string($row,$col++,$user);
