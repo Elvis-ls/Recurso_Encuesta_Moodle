@@ -18,7 +18,7 @@
  * Version information
  *
  * @package    mod_coursesat
- * @copyright  2024 Tu Nombre
+ * @copyright  2024 
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
